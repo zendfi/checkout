@@ -29,6 +29,7 @@ export default function PaymentPage() {
     setCheckoutData,
     setPaymentStatus,
     setSuccessModalOpen,
+    successModalOpen,
     paymentStatus,
   } = useCheckoutStore();
   
@@ -72,18 +73,29 @@ export default function PaymentPage() {
       const status = await api.getPaymentStatus(checkoutData.payment_id);
       setPaymentStatus(status);
 
-      if (status.status === 'confirmed') {
+      if (status.status === 'confirmed' && !successModalOpen) {
         setSuccessModalOpen(true);
+      }
+
+      const terminalStates = ['confirmed', 'failed', 'expired', 'cancelled'];
+      if (terminalStates.includes(status.status)) {
+        return true;
       }
     } catch (err) {
       console.error('Status poll error:', err);
     }
-  }, [checkoutData?.payment_id, setPaymentStatus, setSuccessModalOpen]);
+    return false;
+  }, [checkoutData?.payment_id, setPaymentStatus, setSuccessModalOpen, successModalOpen]);
 
   useEffect(() => {
     if (!checkoutData?.payment_id) return;
 
-    const interval = setInterval(pollStatus, 3000);
+    const interval = setInterval(async () => {
+      const shouldStop = await pollStatus();
+      if (shouldStop) {
+        clearInterval(interval);
+      }
+    }, 3000);
     return () => clearInterval(interval);
   }, [checkoutData?.payment_id, pollStatus]);
 

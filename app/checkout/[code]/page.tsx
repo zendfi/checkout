@@ -30,13 +30,13 @@ export default function CheckoutPage() {
     setCheckoutData,
     setPaymentStatus,
     setSuccessModalOpen,
+    successModalOpen,
     paymentStatus,
   } = useCheckoutStore();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load checkout data
   useEffect(() => {
     if (!linkCode) return;
 
@@ -45,7 +45,6 @@ export default function CheckoutPage() {
         setLoading(true);
         setError(null);
         
-        // Create payment from link
         const data = await api.createPaymentFromLink(linkCode);
         console.log('Checkout data loaded - Network:', data.solana_network, 'Token:', data.token);
         setCheckoutData(data);
@@ -70,7 +69,6 @@ export default function CheckoutPage() {
     loadCheckoutData();
   }, [linkCode, setCheckoutData]);
 
-  // Poll for payment status
   const pollStatus = useCallback(async () => {
     if (!checkoutData?.payment_id) return;
 
@@ -78,22 +76,32 @@ export default function CheckoutPage() {
       const status = await api.getPaymentStatus(checkoutData.payment_id);
       setPaymentStatus(status);
 
-      if (status.status === 'confirmed') {
+      if (status.status === 'confirmed' && !successModalOpen) {
         setSuccessModalOpen(true);
+      }
+
+      const terminalStates = ['confirmed', 'failed', 'expired', 'cancelled'];
+      if (terminalStates.includes(status.status)) {
+        return true;
       }
     } catch (err) {
       console.error('Status poll error:', err);
     }
-  }, [checkoutData?.payment_id, setPaymentStatus, setSuccessModalOpen]);
+    return false;
+  }, [checkoutData?.payment_id, setPaymentStatus, setSuccessModalOpen, successModalOpen]);
 
   useEffect(() => {
     if (!checkoutData?.payment_id) return;
 
-    const interval = setInterval(pollStatus, 3000);
+    const interval = setInterval(async () => {
+      const shouldStop = await pollStatus();
+      if (shouldStop) {
+        clearInterval(interval);
+      }
+    }, 3000);
     return () => clearInterval(interval);
   }, [checkoutData?.payment_id, pollStatus]);
 
-  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
