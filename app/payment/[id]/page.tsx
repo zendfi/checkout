@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import { useCheckoutStore } from '@/lib/store';
@@ -35,6 +35,7 @@ export default function PaymentPage() {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!paymentId) return;
@@ -67,7 +68,7 @@ export default function PaymentPage() {
   }, [paymentId, setCheckoutData]);
 
   const pollStatus = useCallback(async () => {
-    if (!checkoutData?.payment_id) return;
+    if (!checkoutData?.payment_id) return false;
 
     try {
       const status = await api.getPaymentStatus(checkoutData.payment_id);
@@ -78,26 +79,40 @@ export default function PaymentPage() {
       }
 
       const terminalStates = ['confirmed', 'failed', 'expired', 'cancelled'];
-      if (terminalStates.includes(status.status)) {
-        return true;
-      }
+      return terminalStates.includes(status.status);
     } catch (err) {
       console.error('Status poll error:', err);
+      return false;
     }
-    return false;
   }, [checkoutData?.payment_id, setPaymentStatus, setSuccessModalOpen, successModalOpen]);
 
   useEffect(() => {
     if (!checkoutData?.payment_id) return;
 
-    const interval = setInterval(async () => {
+    const terminalStates = ['confirmed', 'failed', 'expired', 'cancelled'];
+    if (paymentStatus && terminalStates.includes(paymentStatus.status)) {
+      return;
+    }
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(async () => {
       const shouldStop = await pollStatus();
-      if (shouldStop) {
-        clearInterval(interval);
+      if (shouldStop && intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     }, 3000);
-    return () => clearInterval(interval);
-  }, [checkoutData?.payment_id, pollStatus]);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [checkoutData?.payment_id, pollStatus, paymentStatus]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
