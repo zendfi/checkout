@@ -92,7 +92,7 @@ export const api = {
 
   // Create payment from link
   async createPaymentFromLink(linkCode: string): Promise<HostedCheckoutData> {
-    const response = await fetch(`${API_BASE}/api/v1/pay/link/${linkCode}`, {
+    const response = await fetch(`${API_BASE}/api/v1/payment-links/${linkCode}/pay`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });
