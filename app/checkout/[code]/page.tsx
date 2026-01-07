@@ -47,6 +47,7 @@ export default function CheckoutPage() {
         
         // Create payment from link
         const data = await api.createPaymentFromLink(linkCode);
+        console.log('Checkout data loaded - Network:', data.solana_network, 'Token:', data.token);
         setCheckoutData(data);
       } catch (err) {
         console.error('Failed to load checkout:', err);

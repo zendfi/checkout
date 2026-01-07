@@ -42,7 +42,6 @@ export function WalletTab() {
   const [connectButtonText, setConnectButtonText] = useState('Connect Wallet');
   const [supportText, setSupportText] = useState('Supports Phantom, Solflare, Backpack, Glow & more');
 
-  // Detect available wallets on mount
   useEffect(() => {
     const wallets = getAvailableWallets();
     setAvailableWallets(wallets);
@@ -64,7 +63,6 @@ export function WalletTab() {
     }
   }, []);
 
-  // Check wallet balance
   const checkWalletBalance = useCallback(async () => {
     if (!wallet?.publicKey || !checkoutData) return true;
 
@@ -74,13 +72,14 @@ export function WalletTab() {
     }
 
     try {
+      console.log('Checking balance for network:', checkoutData.solana_network);
       const data = await api.checkBalance({
         wallet_address: wallet.publicKey,
         token: checkoutData.token,
         network: checkoutData.solana_network,
       });
 
-      console.log('SOL Balance:', data.sol_balance);
+      console.log('Balance check response - Network:', data.network, 'SOL:', data.sol_balance);
 
       if (checkoutData.token !== 'SOL' && data.token_balance !== null) {
         const tokenBalance = data.token_balance;
@@ -106,7 +105,6 @@ export function WalletTab() {
     }
   }, [wallet, checkoutData, amount, setHasInsufficientBalance, setBalanceWarning]);
 
-  // Check balance when wallet connects
   useEffect(() => {
     if (wallet?.publicKey) {
       checkWalletBalance();
@@ -161,7 +159,6 @@ export function WalletTab() {
     setBalanceWarning(null);
     setHasInsufficientBalance(false);
 
-    // Reset connect button text
     const wallets = getAvailableWallets();
     if (wallets.length > 0) {
       setConnectButtonText(
@@ -266,7 +263,6 @@ export function WalletTab() {
       setIsProcessing(true);
       setProcessingMessage('Building transaction...');
 
-      // Build transaction
       const buildData = await api.buildTransaction(checkoutData.payment_id, {
         payer_wallet: wallet.publicKey,
         amount_override: checkoutData.allow_custom_amount ? amount : null,
@@ -286,14 +282,12 @@ export function WalletTab() {
         setProcessingMessage('Please sign in your wallet...');
       }
 
-      // Decode transaction
       const transactionBuffer = Uint8Array.from(atob(transactionBase64), (c) => c.charCodeAt(0));
       const transaction = Transaction.from(transactionBuffer);
 
       let signature: string;
       let signedTransaction: Transaction | null = null;
 
-      // Sign transaction
       if (isGasless) {
         console.log('Gasless mode: Requesting customer signature only...');
         signedTransaction = await wallet.provider.signTransaction(transaction);
@@ -306,7 +300,6 @@ export function WalletTab() {
 
       setProcessingMessage(isGasless ? '⚡ Submitting transaction...' : 'Verifying transaction...');
 
-      // Submit to backend
       if (requiresBackendSubmission && signedTransaction) {
         const serialized = signedTransaction.serialize();
         const base64 = btoa(String.fromCharCode(...Array.from(serialized)));

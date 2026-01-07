@@ -45,6 +45,7 @@ export default function PaymentPage() {
         setError(null);
         
         const data = await api.getPaymentData(paymentId);
+        console.log('Payment data loaded - Network:', data.solana_network, 'Token:', data.token);
         setCheckoutData(data);
       } catch (err) {
         console.error('Failed to load payment:', err);

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { useCheckoutStore } from '@/lib/store';
 
-// QRious type declaration
 declare class QRious {
   constructor(options: { element: HTMLCanvasElement; value: string; size: number });
 }
@@ -13,12 +12,10 @@ export function QRTab() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const qrInitialized = useRef(false);
 
-  // Initialize QR code
   useEffect(() => {
     if (activeTab !== 'qr' || !canvasRef.current || !checkoutData?.payment_url) return;
     if (qrInitialized.current) return;
 
-    // Load QRious library dynamically
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/qrious@4/dist/qrious.min.js';
     script.onload = () => {
