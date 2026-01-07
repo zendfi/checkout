@@ -1,4 +1,3 @@
-// Checkout data types matching checkout.rs
 export interface HostedCheckoutData {
   payment_id: string;
   merchant_name: string;

@@ -1,5 +1,3 @@
-// Wallet detection utilities matching checkout.rs functionality
-
 export interface DetectedWallet {
   name: string;
   provider: any;
@@ -92,7 +90,6 @@ export function getAvailableWallets(): DetectedWallet[] {
     });
   }
 
-  // Fallback to generic solana provider
   if (!wallets.length && window.solana) {
     wallets.push({
       name: 'Solana Wallet',

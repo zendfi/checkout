@@ -11,7 +11,6 @@ export function CustomerInfoForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailError, setEmailError] = useState(false);
 
-  // Form fields
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');

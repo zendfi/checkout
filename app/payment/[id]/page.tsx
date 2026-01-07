@@ -35,7 +35,6 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load payment data
   useEffect(() => {
     if (!paymentId) return;
 
@@ -66,7 +65,6 @@ export default function PaymentPage() {
     loadPaymentData();
   }, [paymentId, setCheckoutData]);
 
-  // Poll for payment status
   const pollStatus = useCallback(async () => {
     if (!checkoutData?.payment_id) return;
 
@@ -89,7 +87,6 @@ export default function PaymentPage() {
     return () => clearInterval(interval);
   }, [checkoutData?.payment_id, pollStatus]);
 
-  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

@@ -30,7 +30,6 @@ export function BankTab() {
   const statusIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Timer for elapsed time
   useEffect(() => {
     if (bankTransferStartTime && step === 'details') {
       timerIntervalRef.current = setInterval(() => {
@@ -48,7 +47,6 @@ export function BankTab() {
     };
   }, [bankTransferStartTime, step]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (statusIntervalRef.current) {
@@ -111,7 +109,6 @@ export function BankTab() {
       setStep('details');
       setBankTransferStartTime(Date.now());
       
-      // Start polling for status
       startStatusPolling(orderData.order_id);
     } catch (err) {
       console.error('Verification error:', err);

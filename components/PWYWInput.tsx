@@ -31,7 +31,6 @@ export function PWYWInput() {
     setAmount(validAmount);
     console.log('Amount updated to:', validAmount);
 
-    // Re-check balance if wallet is connected
     if (wallet?.publicKey && checkoutData) {
       try {
         const balance = await api.checkBalance({
