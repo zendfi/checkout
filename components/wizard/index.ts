@@ -6,3 +6,4 @@ export { CheckoutHeaderNew } from './CheckoutHeaderNew';
 export { SecurityFooter } from './SecurityFooter';
 export { WalletIconGrid } from './WalletIconGrid';
 export { TokenIconRow } from './TokenIconRow';
+export { QRCodeDisplay } from './QRCodeDisplay';

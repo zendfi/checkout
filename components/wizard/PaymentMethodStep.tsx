@@ -9,11 +9,13 @@ import {
   Building2, 
   Pencil, 
   ChevronRight,
-  QrCode,
+  Copy,
+  Check,
   ArrowLeft
 } from 'lucide-react';
 import { WalletIconGrid } from './WalletIconGrid';
 import { TokenIconRow } from './TokenIconRow';
+import { QRCodeDisplay } from './QRCodeDisplay';
 import { 
   getAvailableWallets, 
   isMobileDevice, 
@@ -48,6 +50,7 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
 
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(null);
   const [availableWallets, setAvailableWallets] = useState<DetectedWallet[]>([]);
+  const [addressCopied, setAddressCopied] = useState(false);
 
   useEffect(() => {
     const wallets = getAvailableWallets();
@@ -281,27 +284,47 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
 
             {/* QR Code Section (expanded) */}
             {selectedMethod === 'qr' && checkoutData && (
-              <div className="animate-slide-down mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="qr-container">
-                  <img
-                    src={checkoutData.qr_code}
-                    alt="Payment QR Code"
-                    className="qr-code bg-white"
-                  />
+              <div className="animate-slide-down mb-4 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 bg-white rounded-xl shadow-inner border border-gray-100">
+                    <QRCodeDisplay 
+                      value={checkoutData.payment_url} 
+                      size={200}
+                    />
+                  </div>
                 </div>
-                <p className="text-center text-sm text-gray-500 mb-3">
+                <p className="text-center text-sm text-gray-500 mb-4">
                   Scan with your Solana wallet app
                 </p>
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(checkoutData.wallet_address);
-                    }}
-                    className="btn btn-secondary text-sm py-2 px-4 w-auto"
-                  >
-                    Copy Address
-                  </button>
+                
+                {/* Wallet Address */}
+                <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <p className="text-xs text-gray-500 mb-1 text-center">Wallet Address</p>
+                  <p className="text-sm font-mono text-gray-700 text-center break-all">
+                    {checkoutData.wallet_address}
+                  </p>
                 </div>
+
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(checkoutData.wallet_address);
+                    setAddressCopied(true);
+                    setTimeout(() => setAddressCopied(false), 2000);
+                  }}
+                  className="btn btn-secondary w-full flex items-center justify-center gap-2"
+                >
+                  {addressCopied ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-500" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copy Address
+                    </>
+                  )}
+                </button>
               </div>
             )}
 
