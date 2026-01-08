@@ -66,6 +66,14 @@ interface CheckoutState {
   
   error: string | null;
   setError: (error: string | null) => void;
+
+  // Wizard state
+  wizardStep: number;
+  setWizardStep: (step: number) => void;
+  customerName: string;
+  setCustomerName: (name: string) => void;
+  customerEmail: string;
+  setCustomerEmail: (email: string) => void;
 }
 
 export const useCheckoutStore = create<CheckoutState>((set) => ({
@@ -119,4 +127,12 @@ export const useCheckoutStore = create<CheckoutState>((set) => ({
   
   error: null,
   setError: (error) => set({ error }),
+
+  // Wizard state
+  wizardStep: 1,
+  setWizardStep: (step) => set({ wizardStep: step }),
+  customerName: '',
+  setCustomerName: (name) => set({ customerName: name }),
+  customerEmail: '',
+  setCustomerEmail: (email) => set({ customerEmail: email }),
 }));

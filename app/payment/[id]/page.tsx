@@ -4,15 +4,12 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import { useCheckoutStore } from '@/lib/store';
-import { CheckoutHeader } from '@/components/CheckoutHeader';
-import { AmountDisplay } from '@/components/AmountDisplay';
-import { PWYWInput } from '@/components/PWYWInput';
-import { TabNavigation } from '@/components/TabNavigation';
-import { CustomerInfoForm } from '@/components/CustomerInfoForm';
-import { WalletTab } from '@/components/WalletTab';
-import { QRTab } from '@/components/QRTab';
+import { ProgressIndicator } from '@/components/wizard/ProgressIndicator';
+import { CheckoutHeaderNew } from '@/components/wizard/CheckoutHeaderNew';
+import { PersonalInfoStep } from '@/components/wizard/PersonalInfoStep';
+import { PaymentMethodStep } from '@/components/wizard/PaymentMethodStep';
+import { SecurityFooter } from '@/components/wizard/SecurityFooter';
 import { Timer } from '@/components/Timer';
-import { Footer } from '@/components/Footer';
 import { ErrorModal } from '@/components/modals/ErrorModal';
 import { SuccessModal } from '@/components/modals/SuccessModal';
 import { CopySuccessModal } from '@/components/modals/CopySuccessModal';
@@ -31,6 +28,10 @@ export default function PaymentPage() {
     setSuccessModalOpen,
     successModalOpen,
     paymentStatus,
+    wizardStep,
+    setWizardStep,
+    customerName,
+    customerEmail,
   } = useCheckoutStore();
   
   const [loading, setLoading] = useState(true);
@@ -128,6 +129,14 @@ export default function PaymentPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const handleStep1Complete = () => {
+    setWizardStep(2);
+  };
+
+  const handleBackToStep1 = () => {
+    setWizardStep(1);
+  };
+
   if (loading) {
     return <LoadingState />;
   }
@@ -148,33 +157,43 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="card max-w-md w-full animate-slide-up">
-        <CheckoutHeader
-          merchantName={checkoutData.merchant_name}
-          network={checkoutData.solana_network}
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div className="card max-w-[480px] w-full animate-slide-up">
+        {/* Header */}
+        <CheckoutHeaderNew 
+          merchantName={checkoutData.merchant_name} 
+          network={checkoutData.solana_network} 
         />
 
-        <div className="p-6">
-          <AmountDisplay />
-          
-          {checkoutData.description && (
-            <p className="text-gray-500 text-center mb-6">{checkoutData.description}</p>
-          )}
-
-          {checkoutData.allow_custom_amount && <PWYWInput />}
-
-          <TabNavigation showBankTab={false} />
-
-          <CustomerInfoForm />
-
-          <WalletTab />
-          <QRTab />
-
-          <Timer expiresAt={checkoutData.expires_at} />
+        {/* Progress Indicator */}
+        <div className="px-6 border-b border-gray-100">
+          <ProgressIndicator currentStep={wizardStep} totalSteps={2} />
         </div>
 
-        <Footer />
+        {/* Step Content */}
+        <div className="p-6">
+          {wizardStep === 1 && (
+            <PersonalInfoStep onContinue={handleStep1Complete} />
+          )}
+
+          {wizardStep === 2 && (
+            <PaymentMethodStep
+              onBack={handleBackToStep1}
+              customerName={customerName}
+              customerEmail={customerEmail}
+            />
+          )}
+
+          {/* Timer (only show on step 2) */}
+          {wizardStep === 2 && !isCompleted && !isExpired && (
+            <div className="mt-6">
+              <Timer expiresAt={checkoutData.expires_at} />
+            </div>
+          )}
+        </div>
+
+        {/* Security Footer */}
+        <SecurityFooter />
       </div>
 
       {/* Modals */}
