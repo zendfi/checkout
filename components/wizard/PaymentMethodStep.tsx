@@ -156,10 +156,40 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
 
       await api.submitGaslessTransaction(checkoutData.payment_id, base64Tx);
 
-      setProcessingMessage('Verifying payment...');
-      // Status polling will handle the rest
+      setProcessingMessage('Confirming on blockchain...');
+      
+      // Poll for confirmation (timeout after 60 seconds)
+      const startTime = Date.now();
+      const maxWaitTime = 60000; // 60 seconds
+      
+      while (Date.now() - startTime < maxWaitTime) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        try {
+          const status = await api.getPaymentStatus(checkoutData.payment_id);
+          
+          if (status.status === 'confirmed') {
+            setSuccessModalOpen(true);
+            setIsProcessing(false);
+            return;
+          }
+          
+          if (status.status === 'failed' || status.status === 'expired') {
+            throw new Error(`Payment ${status.status}`);
+          }
+        } catch (pollErr) {
+          console.warn('Status poll error:', pollErr);
+          // Continue polling on network errors
+        }
+      }
+      
+      // Timeout - but transaction might still confirm
+      setIsProcessing(false);
+      setProcessingMessage('');
+      
     } catch (err) {
       console.error('Payment error:', err);
+      setIsProcessing(false);
       setErrorModal({
         isOpen: true,
         icon: <Wallet className="w-6 h-6" />,
@@ -168,8 +198,6 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
         body: <p className="text-gray-600">{(err as Error).message}</p>,
         actionText: 'Try Again',
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 
