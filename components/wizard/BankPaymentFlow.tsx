@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCheckoutStore } from '@/lib/store';
 import { api } from '@/lib/api';
 import { 
@@ -31,11 +31,14 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
   } = useCheckoutStore();
 
   const [step, setStep] = useState<BankFlowStep>('sending-otp');
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const otpValue = otp.join('');
 
   // Send OTP on mount
   useEffect(() => {
@@ -106,7 +109,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
         payment_link_id: checkoutData.payment_link_id?.toString() || null,
       });
       setResendCooldown(60);
-      setOtp('');
+      setOtp(['', '', '', '', '', '']);
     } catch (err) {
       setError((err as Error).message || 'Failed to resend code');
     } finally {
@@ -115,14 +118,14 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length < 4 || !checkoutData) return;
+    if (otpValue.length < 6 || !checkoutData) return;
 
     setIsLoading(true);
     setError(null);
     try {
       const order = await api.onrampCreateOrder({
         customer_email: customerEmail,
-        otp,
+        otp: otpValue,
         fiat_amount: amount,
         currency: 'USD',
         payment_link_id: checkoutData.payment_link_id?.toString() || null,
@@ -143,6 +146,46 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
     setCopied(field);
     setTimeout(() => setCopied(null), 2000);
   }, []);
+
+  const handleOtpChange = (index: number, value: string) => {
+    // Only allow digits
+    const digit = value.replace(/\D/g, '').slice(-1);
+    
+    const newOtp = [...otp];
+    newOtp[index] = digit;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (digit && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      // Move to previous input on backspace if current is empty
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (pastedData) {
+      const newOtp = [...otp];
+      for (let i = 0; i < pastedData.length && i < 6; i++) {
+        newOtp[i] = pastedData[i];
+      }
+      setOtp(newOtp);
+      // Focus the next empty input or the last one
+      const nextEmptyIndex = newOtp.findIndex(d => !d);
+      inputRefs.current[nextEmptyIndex === -1 ? 5 : nextEmptyIndex]?.focus();
+    }
+  };
 
   // Sending OTP screen
   if (step === 'sending-otp') {
@@ -175,27 +218,45 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-2 mb-3 flex items-start gap-2">
+          <div className="bg-red-50 border border-red-200 rounded-md p-2 mb-4 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-red-600">{error}</p>
           </div>
         )}
 
-        <div className="mb-3">
-          <label className="text-xs font-medium text-gray-700 mb-1 block">
-            Verification Code
+        {/* OTP Input Grid */}
+        <div className="mb-4">
+          <label className="text-xs font-medium text-gray-500 mb-2 block text-center">
+            Enter verification code
           </label>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-            placeholder="Enter 6-digit code"
-            className="input text-center tracking-widest font-mono text-lg"
-            autoFocus
-          />
+          <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(el) => { inputRefs.current[index] = el; }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleOtpChange(index, e.target.value)}
+                onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                autoFocus={index === 0}
+                className={`
+                  w-11 h-12 text-center text-lg font-semibold
+                  border-2 rounded-lg transition-all duration-150
+                  focus:outline-none focus:ring-0
+                  ${digit 
+                    ? 'border-primary-DEFAULT bg-primary-50 text-primary-700' 
+                    : 'border-gray-200 bg-gray-50 text-gray-900 focus:border-primary-DEFAULT focus:bg-white'
+                  }
+                  ${error ? 'border-red-300 bg-red-50' : ''}
+                `}
+              />
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-400 text-center mt-2">
+            Paste from clipboard or type manually
+          </p>
         </div>
 
         <div className="flex gap-2 mb-3">
@@ -210,7 +271,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
           <button
             onClick={handleVerifyOtp}
             className="btn btn-primary flex-1"
-            disabled={isLoading || otp.length < 4}
+            disabled={isLoading || otpValue.length < 6}
           >
             {isLoading ? (
               <>
