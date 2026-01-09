@@ -31,7 +31,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
   } = useCheckoutStore();
 
   const [step, setStep] = useState<BankFlowStep>('sending-otp');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
@@ -109,7 +109,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
         payment_link_id: checkoutData.payment_link_id?.toString() || null,
       });
       setResendCooldown(60);
-      setOtp(['', '', '', '', '', '']);
+      setOtp(['', '', '', '']);
     } catch (err) {
       setError((err as Error).message || 'Failed to resend code');
     } finally {
@@ -118,7 +118,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
   };
 
   const handleVerifyOtp = async () => {
-    if (otpValue.length < 6 || !checkoutData) return;
+    if (otpValue.length < 4 || !checkoutData) return;
 
     setIsLoading(true);
     setError(null);
@@ -156,7 +156,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
     setOtp(newOtp);
 
     // Auto-focus next input
-    if (digit && index < 5) {
+    if (digit && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -167,23 +167,23 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
       inputRefs.current[index - 1]?.focus();
     } else if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < 5) {
+    } else if (e.key === 'ArrowRight' && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleOtpPaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
     if (pastedData) {
       const newOtp = [...otp];
-      for (let i = 0; i < pastedData.length && i < 6; i++) {
+      for (let i = 0; i < pastedData.length && i < 4; i++) {
         newOtp[i] = pastedData[i];
       }
       setOtp(newOtp);
       // Focus the next empty input or the last one
       const nextEmptyIndex = newOtp.findIndex(d => !d);
-      inputRefs.current[nextEmptyIndex === -1 ? 5 : nextEmptyIndex]?.focus();
+      inputRefs.current[nextEmptyIndex === -1 ? 3 : nextEmptyIndex]?.focus();
     }
   };
 
@@ -271,7 +271,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
           <button
             onClick={handleVerifyOtp}
             className="btn btn-primary flex-1"
-            disabled={isLoading || otpValue.length < 6}
+            disabled={isLoading || otpValue.length < 4}
           >
             {isLoading ? (
               <>

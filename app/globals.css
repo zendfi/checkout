@@ -61,7 +61,7 @@ body {
   padding: 10px 12px;
   padding-left: 38px;
   font-size: 13px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   border-radius: 8px;
   background: white;
   color: #111827;
@@ -165,7 +165,7 @@ body {
 .btn-secondary {
   background: white;
   color: #374151;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -295,7 +295,7 @@ body {
   height: 48px;
   padding: 8px;
   border-radius: 10px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   background: white;
   cursor: pointer;
   transition: all 150ms ease;
@@ -355,7 +355,7 @@ body {
   gap: 3px;
   padding: 6px 4px;
   background: white;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease;
@@ -412,7 +412,7 @@ body {
 .other-wallets-section {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #F1F5F9;
+  border-top: 0.5px solid #F1F5F9;
 }
 
 .other-wallets-toggle {
@@ -422,7 +422,7 @@ body {
   width: 100%;
   padding: 6px 10px;
   background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   border-radius: 6px;
   cursor: pointer;
   transition: all 150ms ease;
@@ -510,7 +510,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 .token-icon img {
@@ -534,7 +534,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease;
@@ -620,7 +620,7 @@ body {
   background: #F8FAFC;
   border-radius: 8px;
   padding: 12px 14px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 .summary-row {
@@ -631,7 +631,7 @@ body {
 }
 
 .summary-row:not(:last-child) {
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 0.5px solid #E5E7EB;
 }
 
 .summary-label {
@@ -654,7 +654,7 @@ body {
   padding: 10px;
   color: #94A3B8;
   font-size: 10px;
-  border-top: 1px solid #F1F5F9;
+  border-top: 0.5px solid #F1F5F9;
 }
 
 .security-footer svg {
@@ -669,7 +669,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease;
@@ -782,13 +782,13 @@ body {
 
 .modal-footer {
   padding: 10px 16px 16px;
-  border-top: 1px solid #F1F5F9;
+  border-top: 0.5px solid #F1F5F9;
 }
 
 /* ===== Tab Navigation - Compact ===== */
 .tab-nav {
   display: flex;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 0.5px solid #E5E7EB;
   margin-bottom: 12px;
 }
 
@@ -822,7 +822,7 @@ body {
   padding: 14px;
   background: #F8FAFC;
   border-radius: 8px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   margin-bottom: 10px;
 }
 
@@ -830,7 +830,7 @@ body {
   width: 160px;
   height: 160px;
   border-radius: 6px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 /* ===== PWYW Container - Compact ===== */
@@ -839,7 +839,7 @@ body {
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 12px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 .pwyw-input-group {
@@ -879,13 +879,13 @@ body {
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 12px;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 /* ===== Info Box - Compact ===== */
 .info-box {
   background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 10px;
@@ -911,7 +911,7 @@ body {
   border-radius: 6px;
   padding: 8px;
   margin: 8px 0;
-  border: 1px solid #E2E8F0;
+  border: 0.5px solid #E5E7EB;
 }
 
 .modal-list-item {
