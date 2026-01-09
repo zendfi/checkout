@@ -98,11 +98,15 @@ export interface OnrampCreateOrderRequest {
 
 export interface OnrampOrderResponse {
   order_id: string;
+  paj_order_id: string;
   bank_name: string;
   bank_account_number: string;
   bank_account_name: string;
   fiat_amount: number;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  token_amount: number;
+  exchange_rate: number;
+  customer_wallet: string;
+  status: string;
 }
 
 export type NetworkConfig = {

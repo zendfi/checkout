@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { WalletIconGrid } from './WalletIconGrid';
 import { QRCodeDisplay } from './QRCodeDisplay';
+import { BankPaymentFlow } from './BankPaymentFlow';
 import { 
   getAvailableWallets, 
   isMobileDevice, 
@@ -343,55 +344,12 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
               </button>
             </div>
           </div>
-        ) : selectedMethod === 'bank' && checkoutData?.onramp ? (
-          /* Bank Transfer Slide-in Card */
-          <div className="animate-slide-down">
-            <div className="text-center mb-4">
-              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Building2 className="w-6 h-6 text-blue-600" />
-              </div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-1">Bank Transfer</h4>
-              <p className="text-xs text-gray-500">Transfer ${amount.toFixed(2)} from your bank</p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-md p-3 mb-3">
-              <p className="text-xs text-gray-500 mb-2">Pay directly from your bank account - no crypto wallet needed.</p>
-              <ul className="text-xs text-gray-600 space-y-1">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-green-500" />
-                  No crypto wallet needed
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-green-500" />
-                  Pay with your bank account
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setSelectedMethod(null)}
-                className="btn btn-ghost flex-1 text-xs"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                Back
-              </button>
-              <button
-                onClick={() => {
-                  // Open onramp in new tab with payment details
-                  const params = new URLSearchParams({
-                    amount: amount.toString(),
-                    payment_id: checkoutData.payment_id,
-                  });
-                  window.open(`/onramp?${params.toString()}`, '_blank');
-                }}
-                className="btn btn-primary flex-1"
-              >
-                Continue to Bank
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+        ) : selectedMethod === 'bank' && checkoutData?.onramp && customerEmail ? (
+          /* Bank Transfer Flow */
+          <BankPaymentFlow 
+            onBack={() => setSelectedMethod(null)} 
+            customerEmail={customerEmail}
+          />
         ) : (
           /* Default - Show payment method options */
           <>
