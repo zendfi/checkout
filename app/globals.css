@@ -363,13 +363,11 @@ body {
 }
 
 .wallet-btn:hover {
-  border-color: #6366F1;
-  transform: scale(1.02);
-  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.1);
+  border-color: #CBD5E1;
 }
 
 .wallet-btn:active {
-  transform: scale(0.98);
+  background: #F8FAFC;
 }
 
 .wallet-btn-icon {

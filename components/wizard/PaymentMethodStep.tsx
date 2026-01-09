@@ -14,7 +14,6 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { WalletIconGrid } from './WalletIconGrid';
-import { TokenIconRow } from './TokenIconRow';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { 
   getAvailableWallets, 
@@ -248,8 +247,8 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
         </div>
       </div>
 
-      {/* Transfer Funds Section */}
-      <div>
+      {/* Transfer Funds Section - Card 1 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
         <h3 className="section-title">Transfer Funds</h3>
 
         {/* Wallet Connected State */}
@@ -291,107 +290,153 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
               )}
             </button>
           </div>
+        ) : selectedMethod === 'qr' && checkoutData ? (
+          /* Wallet Transfer Slide-in Card */
+          <div className="animate-slide-down">
+            <div className="flex justify-center mb-3">
+              <div className="p-3 bg-white rounded-lg border border-gray-100">
+                <QRCodeDisplay 
+                  value={checkoutData.payment_url} 
+                  size={160}
+                />
+              </div>
+            </div>
+            <p className="text-center text-xs text-gray-500 mb-3">
+              Scan with your Solana wallet app
+            </p>
+            
+            {/* Wallet Address */}
+            <div className="bg-gray-50 rounded-md p-2 mb-3">
+              <p className="text-[10px] text-gray-500 mb-1 text-center">Wallet Address</p>
+              <p className="text-[11px] font-mono text-gray-700 text-center break-all">
+                {checkoutData.wallet_address}
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedMethod(null)}
+                className="btn btn-ghost flex-1 text-xs"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(checkoutData.wallet_address);
+                  setAddressCopied(true);
+                  setTimeout(() => setAddressCopied(false), 2000);
+                }}
+                className="btn btn-secondary flex-1 flex items-center justify-center gap-2"
+              >
+                {addressCopied ? (
+                  <>
+                    <Check className="w-3 h-3 text-green-500" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3" />
+                    Copy Address
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        ) : selectedMethod === 'bank' && checkoutData?.onramp ? (
+          /* Bank Transfer Slide-in Card */
+          <div className="animate-slide-down">
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Building2 className="w-6 h-6 text-blue-600" />
+              </div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">Bank Transfer</h4>
+              <p className="text-xs text-gray-500">Transfer ${amount.toFixed(2)} from your bank</p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-md p-3 mb-3">
+              <p className="text-xs text-gray-500 mb-2">Pay directly from your bank account - no crypto wallet needed.</p>
+              <ul className="text-xs text-gray-600 space-y-1">
+                <li className="flex items-center gap-2">
+                  <Check className="w-3 h-3 text-green-500" />
+                  No crypto wallet needed
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3 h-3 text-green-500" />
+                  Pay with your bank account
+                </li>
+              </ul>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedMethod(null)}
+                className="btn btn-ghost flex-1 text-xs"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  // Open onramp in new tab with payment details
+                  const params = new URLSearchParams({
+                    amount: amount.toString(),
+                    payment_id: checkoutData.payment_id,
+                  });
+                  window.open(`/onramp?${params.toString()}`, '_blank');
+                }}
+                className="btn btn-primary flex-1"
+              >
+                Continue to Bank
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         ) : (
+          /* Default - Show payment method options */
           <>
             {/* Wallet Transfer Option */}
             <button
-              onClick={() => setSelectedMethod(selectedMethod === 'qr' ? null : 'qr')}
-              className={`payment-option w-full text-left mb-4 ${selectedMethod === 'qr' ? 'selected' : ''}`}
+              onClick={() => setSelectedMethod('qr')}
+              className="payment-option w-full text-left mb-3"
             >
               <div className="payment-option-icon">
                 <Send className="w-4 h-4" />
               </div>
               <div className="flex-1">
                 <p className="payment-option-title">Wallet Transfer</p>
-                <div className="mt-1">
-                  <TokenIconRow tokens={['USDC', 'USDT', 'SOL']} maxVisible={5} />
-                </div>
+                <p className="payment-option-subtitle">Scan QR or copy address</p>
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
 
-            {/* QR Code Section (expanded) */}
-            {selectedMethod === 'qr' && checkoutData && (
-              <div className="animate-slide-down mb-3 p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex justify-center mb-3">
-                  <div className="p-3 bg-white rounded-lg border border-gray-100">
-                    <QRCodeDisplay 
-                      value={checkoutData.payment_url} 
-                      size={160}
-                    />
-                  </div>
-                </div>
-                <p className="text-center text-xs text-gray-500 mb-3">
-                  Scan with your Solana wallet app
-                </p>
-                
-                {/* Wallet Address */}
-                <div className="bg-gray-50 rounded-md p-2 mb-3">
-                  <p className="text-[10px] text-gray-500 mb-1 text-center">Wallet Address</p>
-                  <p className="text-[11px] font-mono text-gray-700 text-center break-all">
-                    {checkoutData.wallet_address}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(checkoutData.wallet_address);
-                    setAddressCopied(true);
-                    setTimeout(() => setAddressCopied(false), 2000);
-                  }}
-                  className="btn btn-secondary w-full flex items-center justify-center gap-2"
-                >
-                  {addressCopied ? (
-                    <>
-                      <Check className="w-3 h-3 text-green-500" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3 h-3" />
-                      Copy Address
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* OR Divider */}
-            <div className="divider">
-              <span className="divider-text">or</span>
-            </div>
-
-            {/* Connect Wallet Section */}
-            <div>
-              <h4 className="text-xs font-semibold text-gray-700 mb-2">Connect Wallet</h4>
-              <WalletIconGrid onWalletClick={handleWalletSelect} showMore />
-            </div>
-
             {/* Bank Transfer Option (if onramp enabled) */}
             {checkoutData?.onramp && (
-              <>
-                <div className="divider">
-                  <span className="divider-text">or</span>
+              <button
+                onClick={() => setSelectedMethod('bank')}
+                className="payment-option w-full text-left"
+              >
+                <div className="payment-option-icon">
+                  <Building2 className="w-4 h-4" />
                 </div>
-
-                <button
-                  onClick={() => setSelectedMethod('bank')}
-                  className={`payment-option w-full text-left ${selectedMethod === 'bank' ? 'selected' : ''}`}
-                >
-                  <div className="payment-option-icon">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="payment-option-title">Pay with Bank</p>
-                    <p className="payment-option-subtitle">Transfer directly from your bank</p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
-                </button>
-              </>
+                <div className="flex-1">
+                  <p className="payment-option-title">Pay with Bank</p>
+                  <p className="payment-option-subtitle">Transfer directly from your bank</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
             )}
           </>
         )}
       </div>
+
+      {/* Connect Wallet Section - Card 2 (only show when not in slide-in view) */}
+      {!wallet && !selectedMethod && (
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <h4 className="text-xs font-semibold text-gray-700 mb-3">Connect Wallet</h4>
+          <WalletIconGrid onWalletClick={handleWalletSelect} showMore />
+        </div>
+      )}
 
       {/* Back Button */}
       <button
