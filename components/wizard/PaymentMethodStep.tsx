@@ -212,16 +212,16 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="animate-fade-in space-y-4">
       {/* Payment Summary Card */}
       <div className="summary-card">
-        <div className="flex justify-between items-start mb-4">
-          <h4 className="text-sm font-semibold text-gray-900">Payment Details</h4>
+        <div className="flex justify-between items-start mb-2">
+          <h4 className="text-xs font-semibold text-gray-900">Payment Details</h4>
           <button
             onClick={onBack}
-            className="text-sm text-primary-DEFAULT hover:text-primary-700 font-medium flex items-center gap-1"
+            className="text-xs text-primary-DEFAULT hover:text-primary-700 font-medium flex items-center gap-1"
           >
-            <Pencil className="w-3.5 h-3.5" />
+            <Pencil className="w-3 h-3" />
             Edit
           </button>
         </div>
@@ -229,20 +229,20 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
         <div className="space-y-0">
           <div className="summary-row">
             <span className="summary-label">Amount</span>
-            <span className="summary-value font-semibold text-lg">
-              ${amount.toFixed(2)} USD
+            <span className="summary-value font-semibold">
+              ${amount.toFixed(2)}
             </span>
           </div>
           {customerName && (
             <div className="summary-row">
-              <span className="summary-label">Name</span>
+              <span className="summary-label">Full Name</span>
               <span className="summary-value">{customerName}</span>
             </div>
           )}
           {customerEmail && (
             <div className="summary-row">
               <span className="summary-label">Email</span>
-              <span className="summary-value">{customerEmail}</span>
+              <span className="summary-value text-xs">{customerEmail}</span>
             </div>
           )}
         </div>
@@ -250,24 +250,24 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
 
       {/* Transfer Funds Section */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Transfer Funds</h3>
+        <h3 className="section-title">Transfer Funds</h3>
 
         {/* Wallet Connected State */}
         {wallet ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="payment-option selected">
               <div className="payment-option-icon">
-                <Wallet className="w-6 h-6" />
+                <Wallet className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-gray-900">{wallet.name}</p>
-                <p className="text-sm text-gray-500 font-mono">
+                <p className="font-semibold text-gray-900 text-xs">{wallet.name}</p>
+                <p className="text-xs text-gray-500 font-mono">
                   {wallet.publicKey.slice(0, 6)}...{wallet.publicKey.slice(-4)}
                 </p>
               </div>
               <button
                 onClick={handleDisconnectWallet}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-xs text-gray-500 hover:text-gray-700"
               >
                 Disconnect
               </button>
@@ -299,36 +299,36 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
               className={`payment-option w-full text-left mb-4 ${selectedMethod === 'qr' ? 'selected' : ''}`}
             >
               <div className="payment-option-icon">
-                <Send className="w-6 h-6" />
+                <Send className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-gray-900">Wallet Transfer</p>
-                <div className="mt-2">
+                <p className="payment-option-title">Wallet Transfer</p>
+                <div className="mt-1">
                   <TokenIconRow tokens={['USDC', 'USDT', 'SOL']} maxVisible={5} />
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
 
             {/* QR Code Section (expanded) */}
             {selectedMethod === 'qr' && checkoutData && (
-              <div className="animate-slide-down mb-4 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-                <div className="flex justify-center mb-4">
-                  <div className="p-4 bg-white rounded-xl shadow-inner border border-gray-100">
+              <div className="animate-slide-down mb-3 p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex justify-center mb-3">
+                  <div className="p-3 bg-white rounded-lg border border-gray-100">
                     <QRCodeDisplay 
                       value={checkoutData.payment_url} 
-                      size={200}
+                      size={160}
                     />
                   </div>
                 </div>
-                <p className="text-center text-sm text-gray-500 mb-4">
+                <p className="text-center text-xs text-gray-500 mb-3">
                   Scan with your Solana wallet app
                 </p>
                 
                 {/* Wallet Address */}
-                <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                  <p className="text-xs text-gray-500 mb-1 text-center">Wallet Address</p>
-                  <p className="text-sm font-mono text-gray-700 text-center break-all">
+                <div className="bg-gray-50 rounded-md p-2 mb-3">
+                  <p className="text-[10px] text-gray-500 mb-1 text-center">Wallet Address</p>
+                  <p className="text-[11px] font-mono text-gray-700 text-center break-all">
                     {checkoutData.wallet_address}
                   </p>
                 </div>
@@ -343,12 +343,12 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
                 >
                   {addressCopied ? (
                     <>
-                      <Check className="w-4 h-4 text-green-500" />
+                      <Check className="w-3 h-3 text-green-500" />
                       Copied!
                     </>
                   ) : (
                     <>
-                      <Copy className="w-4 h-4" />
+                      <Copy className="w-3 h-3" />
                       Copy Address
                     </>
                   )}
@@ -362,8 +362,8 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
             </div>
 
             {/* Connect Wallet Section */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-gray-700">Connect Wallet</h4>
+            <div>
+              <h4 className="text-xs font-semibold text-gray-700 mb-2">Connect Wallet</h4>
               <WalletIconGrid onWalletClick={handleWalletSelect} showMore />
             </div>
 
@@ -379,13 +379,13 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
                   className={`payment-option w-full text-left ${selectedMethod === 'bank' ? 'selected' : ''}`}
                 >
                   <div className="payment-option-icon">
-                    <Building2 className="w-6 h-6" />
+                    <Building2 className="w-4 h-4" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">Pay with Bank</p>
-                    <p className="text-sm text-gray-500">Transfer directly from your bank account</p>
+                    <p className="payment-option-title">Pay with Bank</p>
+                    <p className="payment-option-subtitle">Transfer directly from your bank</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
                 </button>
               </>
             )}
@@ -396,9 +396,9 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
       {/* Back Button */}
       <button
         onClick={onBack}
-        className="btn btn-ghost w-full"
+        className="btn btn-ghost w-full text-xs"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-3 h-3" />
         Back to Personal Information
       </button>
     </div>

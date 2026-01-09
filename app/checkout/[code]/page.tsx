@@ -164,8 +164,8 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-      <div className="card max-w-[480px] w-full animate-slide-up">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4">
+      <div className="card max-w-[420px] w-full animate-slide-up">
         {/* Header */}
         <CheckoutHeaderNew 
           merchantName={checkoutData.merchant_name} 
@@ -173,12 +173,12 @@ export default function CheckoutPage() {
         />
 
         {/* Progress Indicator */}
-        <div className="px-6 border-b border-gray-100">
+        <div className="px-4 border-b border-gray-100">
           <ProgressIndicator currentStep={wizardStep} totalSteps={2} />
         </div>
 
         {/* Step Content */}
-        <div className="p-6">
+        <div className="p-4">
           {wizardStep === 1 && (
             <PersonalInfoStep onContinue={handleStep1Complete} />
           )}
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
 
           {/* Timer (only show on step 2) */}
           {wizardStep === 2 && !isCompleted && !isExpired && (
-            <div className="mt-6">
+            <div className="mt-4">
               <Timer expiresAt={checkoutData.expires_at} />
             </div>
           )}

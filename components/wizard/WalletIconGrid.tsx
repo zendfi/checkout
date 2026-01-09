@@ -12,7 +12,7 @@ interface WalletIconGridProps {
 // Official wallet brand icons (high-quality SVGs)
 const WALLET_ICONS: Record<string, React.ReactNode> = {
   phantom: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#AB9FF2"/>
       <path d="M110.584 64.9142H99.142C99.142 41.7651 80.173 23 56.7724 23C33.6612 23 14.8716 41.3057 14.4118 64.0583C13.936 87.5898 33.5984 107.529 57.1333 108H62.2274C83.0038 108 110.584 89.1969 110.584 64.9142Z" fill="url(#paint0_phantom)"/>
       <path d="M86.7048 64.9142C86.7048 60.0017 82.7011 56.0195 77.7619 56.0195C72.8227 56.0195 68.8191 60.0017 68.8191 64.9142C68.8191 69.8267 72.8227 73.8089 77.7619 73.8089C82.7011 73.8089 86.7048 69.8267 86.7048 64.9142Z" fill="white"/>
@@ -26,7 +26,7 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   solflare: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#1B1B1B"/>
       <g transform="translate(14, 28) scale(0.78)">
         <path d="M100.48 69.3817L83.8068 86.8015C83.4444 87.1799 83.0058 87.4816 82.5185 87.6878C82.0312 87.894 81.5055 88.0003 80.9743 88H1.93563C1.55849 88 1.18957 87.8926 0.874202 87.6912C0.558829 87.4897 0.310523 87.2029 0.160082 86.8659C0.00964039 86.5289 -0.0359048 86.1562 0.0294104 85.7945C0.0947257 85.4328 0.267982 85.0981 0.527423 84.8335L17.2004 67.4138C17.5628 67.0354 18.0014 66.7336 18.4887 66.5274C18.976 66.3212 19.5017 66.215 20.0329 66.2153H99.0715C99.4486 66.2153 99.8176 66.3226 100.133 66.5241C100.448 66.7256 100.696 67.0124 100.847 67.3494C100.997 67.6864 101.043 68.0591 100.978 68.4208C100.912 68.7825 100.739 69.1171 100.48 69.3817Z" fill="url(#solflare0)"/>
@@ -50,7 +50,7 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   backpack: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#E33E3F"/>
       <path d="M88 44H40C35.5817 44 32 47.5817 32 52V88C32 92.4183 35.5817 96 40 96H88C92.4183 96 96 92.4183 96 88V52C96 47.5817 92.4183 44 88 44Z" stroke="white" strokeWidth="5"/>
       <path d="M48 44V38C48 32.4772 52.4772 28 58 28H70C75.5228 28 80 32.4772 80 38V44" stroke="white" strokeWidth="5"/>
@@ -58,26 +58,26 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   coinbase: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#0052FF"/>
       <path d="M64 24C41.9086 24 24 41.9086 24 64C24 86.0914 41.9086 104 64 104C86.0914 104 104 86.0914 104 64C104 41.9086 86.0914 24 64 24ZM53.6 74.4C49.0295 74.4 45.3 70.6705 45.3 66.1C45.3 61.5295 49.0295 57.8 53.6 57.8H74.4C78.9705 57.8 82.7 61.5295 82.7 66.1C82.7 70.6705 78.9705 74.4 74.4 74.4H53.6Z" fill="white"/>
     </svg>
   ),
   trust: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#0500FF"/>
       <path d="M64 28L32 40V60C32 81.2 46.33 100.5 64 104C81.67 100.5 96 81.2 96 60V40L64 28Z" stroke="white" strokeWidth="5" fill="none"/>
       <path d="M54 64L60 70L74 56" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   ),
   walletconnect: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#3B99FC"/>
       <path d="M40 52C54.36 37.64 77.64 37.64 92 52L94 54C95 55 95 56.6 94 57.6L89 62.6C88.5 63.1 87.7 63.1 87.2 62.6L84.8 60.2C75 50.4 59 50.4 49.2 60.2L46.6 62.8C46.1 63.3 45.3 63.3 44.8 62.8L39.8 57.8C38.8 56.8 38.8 55.2 39.8 54.2L40 52ZM103.6 63.6L108 68C109 69 109 70.6 108 71.6L86 93.6C85 94.6 83.4 94.6 82.4 93.6L67.6 78.8C67.35 78.55 66.95 78.55 66.7 78.8L51.9 93.6C50.9 94.6 49.3 94.6 48.3 93.6L26 71.6C25 70.6 25 69 26 68L30.4 63.6C31.4 62.6 33 62.6 34 63.6L48.8 78.4C49.05 78.65 49.45 78.65 49.7 78.4L64.5 63.6C65.5 62.6 67.1 62.6 68.1 63.6L82.9 78.4C83.15 78.65 83.55 78.65 83.8 78.4L98.6 63.6C99.6 62.6 101.2 62.6 102.2 63.6H103.6Z" fill="white"/>
     </svg>
   ),
   glow: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#0D1117"/>
       <circle cx="64" cy="64" r="36" fill="url(#glow_grad)"/>
       <defs>
@@ -89,7 +89,7 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   metamask: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#F6851B"/>
       <path d="M97.2 30L66.4 52.4L72.4 38.8L97.2 30Z" fill="#E2761B" stroke="#E2761B"/>
       <path d="M30.8 30L61.3 52.6L55.6 38.8L30.8 30Z" fill="#E4761B" stroke="#E4761B"/>
@@ -102,7 +102,7 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   rainbow: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#001A35"/>
       <path d="M32 84C32 55.28 55.28 32 84 32V44C61.9 44 44 61.9 44 84H32Z" fill="#FF4000"/>
       <path d="M44 84C44 61.9 61.9 44 84 44V56C68.54 56 56 68.54 56 84H44Z" fill="#FF8500"/>
@@ -113,7 +113,7 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
   ),
   // Additional wallets for "Other Wallets"
   exodus: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#1F1B4D"/>
       <path d="M96 42L64 32L32 42V86L64 96L96 86V42Z" fill="url(#exodus_grad)"/>
       <defs>
@@ -125,14 +125,14 @@ const WALLET_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   brave: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#FB542B"/>
       <path d="M64 28L44 38L34 54L44 84L64 100L84 84L94 54L84 38L64 28Z" fill="white"/>
       <path d="M64 38L54 44L48 56L54 76L64 88L74 76L80 56L74 44L64 38Z" fill="#FB542B"/>
     </svg>
   ),
   ledger: (
-    <svg width="56" height="56" viewBox="0 0 128 128" fill="none">
+    <svg width="36" height="36" viewBox="0 0 128 128" fill="none">
       <rect width="128" height="128" rx="26" fill="#000000"/>
       <rect x="32" y="44" width="28" height="40" rx="2" fill="white"/>
       <rect x="68" y="64" width="28" height="20" rx="2" fill="white"/>

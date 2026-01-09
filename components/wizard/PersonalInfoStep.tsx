@@ -76,7 +76,7 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
 
   return (
     <div className="animate-fade-in">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Amount Input (if PWYW) */}
         {showAmountInput && (
           <div className="space-y-2">
@@ -122,42 +122,33 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
         )}
 
         {/* Section Title */}
-        <div className="border-t border-gray-100 pt-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-1">
-            Enter Personal Information
+        <div className="pt-3">
+          <h3 className="text-xs font-semibold text-gray-900">
+            Enter Personal Information<span className="text-red-500 ml-0.5">*</span>
           </h3>
-          <p className="text-sm text-gray-500 mb-4">
-            We&apos;ll send your receipt to this email
-          </p>
         </div>
 
         {/* Full Name Input */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Full Name
-          </label>
+        <div>
           <div className="input-with-icon">
             <span className="input-icon">
-              <User className="w-5 h-5" />
+              <User className="w-4 h-4" />
             </span>
             <input
               type="text"
               className="form-input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
+              placeholder="Full Name"
             />
           </div>
         </div>
 
         {/* Email Input */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Email Address<span className="text-red-500 ml-0.5">*</span>
-          </label>
+        <div>
           <div className="input-with-icon">
             <span className="input-icon">
-              <Mail className="w-5 h-5" />
+              <Mail className="w-4 h-4" />
             </span>
             <input
               type="email"
@@ -167,14 +158,14 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
                 setEmail(e.target.value);
                 setEmailError(false);
               }}
-              placeholder="you@example.com"
+              placeholder="Email Address"
               required
             />
           </div>
           {emailError ? (
-            <p className="text-sm text-red-500">Please enter a valid email address</p>
+            <p className="text-xs text-red-500 mt-1">Please enter a valid email address</p>
           ) : (
-            <p className="text-xs text-gray-400">
+            <p className="helper-text">
               We use this to send you a confirmation of your payment
             </p>
           )}
@@ -183,7 +174,7 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
         {/* Continue Button */}
         <button
           type="submit"
-          className="btn btn-primary mt-8"
+          className="btn btn-primary mt-4"
           disabled={!isFormValid() || isSubmitting}
         >
           {isSubmitting ? (
