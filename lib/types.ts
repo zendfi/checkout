@@ -107,6 +107,7 @@ export interface OnrampOrderResponse {
   exchange_rate: number;
   customer_wallet: string;
   status: string;
+  payment_id?: string;
 }
 
 export type NetworkConfig = {

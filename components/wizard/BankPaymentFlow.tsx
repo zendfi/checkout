@@ -133,7 +133,19 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
         payment_intent_id: null,
         webhook_url: null,
       });
+      
       setBankOrder(order);
+      
+      // If payment_id exists, update checkoutData so status polling works
+      if (order.payment_id && checkoutData) {
+        useCheckoutStore.setState(state => ({
+          checkoutData: state.checkoutData ? {
+            ...state.checkoutData,
+            payment_id: order.payment_id!
+          } : null
+        }));
+      }
+      
       setStep('bank-details');
     } catch (err) {
       setError((err as Error).message || 'Invalid verification code');
@@ -421,7 +433,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
             <Check className="w-6 h-6 text-green-600" />
           </div>
           <h4 className="text-sm font-semibold text-gray-900 mb-1">Payment Received!</h4>
-          <p className="text-xs text-gray-500">Processing your order...</p>
+          <p className="text-xs text-gray-500">Thank You!</p>
         </div>
       </div>
     );
