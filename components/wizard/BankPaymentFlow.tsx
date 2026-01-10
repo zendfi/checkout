@@ -14,7 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-type BankFlowStep = 'sending-otp' | 'verify-otp' | 'bank-details' | 'waiting';
+type BankFlowStep = 'sending-otp' | 'verify-otp' | 'bank-details' | 'waiting' | 'completed';
 
 interface BankPaymentFlowProps {
   onBack: () => void;
@@ -83,6 +83,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
       try {
         const status = await api.onrampGetOrder(bankOrder.order_id);
         if (status.status === 'COMPLETED') {
+          setStep('completed'); // Hide the waiting message
           setSuccessModalOpen(true);
           clearInterval(pollInterval);
         } else if (status.status === 'FAILED') {
@@ -304,8 +305,10 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
     );
   }
 
-  // Bank Details screen
-  if (step === 'bank-details' && bankOrder) {
+  // Bank details screen with waiting indicator
+  if (step === 'bank-details') {
+    if (!bankOrder) return null;
+    
     return (
       <div className="animate-slide-down">
         <div className="text-center mb-4">
@@ -405,6 +408,21 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
           <ArrowLeft className="w-3 h-3" />
           Cancel & Go Back
         </button>
+      </div>
+    );
+  }
+
+  // Payment completed - show success state (modal is overlayed)
+  if (step === 'completed') {
+    return (
+      <div className="animate-slide-down">
+        <div className="text-center py-8">
+          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Check className="w-6 h-6 text-green-600" />
+          </div>
+          <h4 className="text-sm font-semibold text-gray-900 mb-1">Payment Received!</h4>
+          <p className="text-xs text-gray-500">Processing your order...</p>
+        </div>
       </div>
     );
   }

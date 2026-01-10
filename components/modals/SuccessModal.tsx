@@ -36,7 +36,7 @@ export function SuccessModal() {
         <div className="px-6 pb-6">
           <div className="bg-gray-50 rounded-xl p-4 space-y-3">
             <p className="text-gray-700 text-center">
-              Your payment has been confirmed on the Solana blockchain.
+              Your payment has been confirmed!
             </p>
             <p className="text-gray-500 text-sm text-center">
               You&apos;ll receive a confirmation email shortly.
