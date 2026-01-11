@@ -39,10 +39,14 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const otpValue = otp.join('');
+  const otpSentRef = useRef(false);
 
-  // Send OTP on mount
+  // Send OTP on mount (only once)
   useEffect(() => {
     if (!customerEmail || !checkoutData) return;
+    if (otpSentRef.current) return; // Already sent OTP, don't resend
+    
+    otpSentRef.current = true;
     
     const sendOtp = async () => {
       setIsLoading(true);

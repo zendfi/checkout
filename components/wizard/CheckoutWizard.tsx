@@ -20,13 +20,10 @@ interface CheckoutWizardProps {
 }
 
 export function CheckoutWizard({ merchantName, network, expiresAt }: CheckoutWizardProps) {
-  const { checkoutData, paymentStatus } = useCheckoutStore();
+  const { checkoutData, paymentStatus, customerName, customerEmail } = useCheckoutStore();
   const [currentStep, setCurrentStep] = useState(1);
-  const [customerInfo, setCustomerInfo] = useState<{ name?: string; email?: string }>({});
 
   const handleStep1Complete = () => {
-    // Store customer info for summary display
-    // In a real implementation, you might get this from form state or store
     setCurrentStep(2);
   };
 
@@ -58,8 +55,8 @@ export function CheckoutWizard({ merchantName, network, expiresAt }: CheckoutWiz
           {currentStep === 2 && (
             <PaymentMethodStep
               onBack={handleBackToStep1}
-              customerName={customerInfo.name}
-              customerEmail={customerInfo.email}
+              customerName={customerName}
+              customerEmail={customerEmail}
             />
           )}
 
