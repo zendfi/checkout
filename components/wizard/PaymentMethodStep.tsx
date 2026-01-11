@@ -212,16 +212,16 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
   };
 
   return (
-    <div className="animate-fade-in space-y-4">
+    <div className="animate-fade-in space-y-3 sm:space-y-4">
       {/* Payment Summary Card */}
       <div className="summary-card">
         <div className="flex justify-between items-start mb-2">
-          <h4 className="text-xs font-semibold text-gray-900">Payment Details</h4>
+          <h4 className="text-[10px] sm:text-xs font-semibold text-gray-900">Payment Details</h4>
           <button
             onClick={onBack}
-            className="text-xs text-primary-DEFAULT hover:text-primary-700 font-medium flex items-center gap-1"
+            className="text-[10px] sm:text-xs text-primary-DEFAULT hover:text-primary-700 font-medium flex items-center gap-1"
           >
-            <Pencil className="w-3 h-3" />
+            <Pencil className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             Edit
           </button>
         </div>
@@ -236,20 +236,20 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
           {customerName && (
             <div className="summary-row">
               <span className="summary-label">Full Name</span>
-              <span className="summary-value">{customerName}</span>
+              <span className="summary-value truncate max-w-[150px] sm:max-w-none">{customerName}</span>
             </div>
           )}
           {customerEmail && (
             <div className="summary-row">
               <span className="summary-label">Email</span>
-              <span className="summary-value text-xs">{customerEmail}</span>
+              <span className="summary-value text-[10px] sm:text-xs truncate max-w-[180px] sm:max-w-none">{customerEmail}</span>
             </div>
           )}
         </div>
       </div>
 
       {/* Transfer Funds Section - Card 1 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white rounded-xl sm:rounded-lg border border-gray-200 p-3 sm:p-4">
         <h3 className="section-title">Transfer Funds</h3>
 
         {/* Wallet Connected State */}
@@ -390,8 +390,8 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
 
       {/* Connect Wallet Section - Card 2 (only show when not in slide-in view) */}
       {!wallet && !selectedMethod && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h4 className="text-xs font-semibold text-gray-700 mb-3">Connect Wallet</h4>
+        <div className="bg-white rounded-xl sm:rounded-lg border border-gray-200 p-3 sm:p-4">
+          <h4 className="text-[10px] sm:text-xs font-semibold text-gray-700 mb-2 sm:mb-3">Connect Wallet</h4>
           <WalletIconGrid onWalletClick={handleWalletSelect} showMore />
         </div>
       )}
@@ -399,10 +399,11 @@ export function PaymentMethodStep({ onBack, customerName, customerEmail }: Payme
       {/* Back Button */}
       <button
         onClick={onBack}
-        className="btn btn-ghost w-full text-xs"
+        className="btn btn-ghost w-full text-[10px] sm:text-xs py-2"
       >
         <ArrowLeft className="w-3 h-3" />
-        Back to Personal Information
+        <span className="hidden sm:inline">Back to Personal Information</span>
+        <span className="sm:hidden">Back</span>
       </button>
     </div>
   );

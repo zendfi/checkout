@@ -36,18 +36,18 @@ export function CheckoutWizard({ merchantName, network, expiresAt }: CheckoutWiz
   const isExpired = new Date(expiresAt) < new Date();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-      <div className="card max-w-[480px] w-full animate-slide-up">
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-0 sm:p-6 bg-white sm:bg-gray-50">
+      <div className="card max-w-[480px] w-full animate-slide-up sm:rounded-xl sm:shadow-card">
         {/* Header */}
         <CheckoutHeaderNew merchantName={merchantName} network={network} />
 
         {/* Progress Indicator */}
-        <div className="px-6 border-b border-gray-100">
+        <div className="px-4 sm:px-6 border-b border-gray-100">
           <ProgressIndicator currentStep={currentStep} totalSteps={2} />
         </div>
 
         {/* Step Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6 flex-1">
           {currentStep === 1 && (
             <PersonalInfoStep onContinue={handleStep1Complete} />
           )}
@@ -62,7 +62,7 @@ export function CheckoutWizard({ merchantName, network, expiresAt }: CheckoutWiz
 
           {/* Timer (only show on step 2) */}
           {currentStep === 2 && !isCompleted && !isExpired && (
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <Timer expiresAt={expiresAt} />
             </div>
           )}

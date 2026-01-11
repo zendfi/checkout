@@ -9,16 +9,18 @@ export function CheckoutHeaderNew({ merchantName, network }: CheckoutHeaderNewPr
   const isTestnet = network === 'devnet' || network === 'testnet';
 
   return (
-    <div className="text-center py-4 px-4 border-b border-gray-100">
+    <div className="text-center py-3 sm:py-4 px-4 border-b border-gray-100 bg-white">
       <div className="flex items-center justify-center gap-2">
-        <h1 className="text-base font-bold text-gray-900">{merchantName}</h1>
+        <h1 className="text-sm sm:text-base font-bold text-gray-900 truncate max-w-[200px] sm:max-w-none">
+          {merchantName}
+        </h1>
         {isTestnet && (
-          <span className="testnet-badge">
+          <span className="testnet-badge flex-shrink-0">
             Testnet
           </span>
         )}
       </div>
-      <p className="text-xs text-gray-500 mt-0.5">
+      <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
         Secure Crypto Payment on Solana
       </p>
     </div>

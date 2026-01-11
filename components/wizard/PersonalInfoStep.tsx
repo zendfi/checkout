@@ -76,20 +76,20 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
 
   return (
     <div className="animate-fade-in">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         {/* Amount Input (if PWYW) */}
         {showAmountInput && (
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700">
               Enter Amount<span className="text-red-500 ml-0.5">*</span>
             </label>
             <div className="input-with-icon">
               <span className="input-icon">
-                <DollarSign className="w-5 h-5" />
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
               </span>
               <input
                 type="number"
-                className="form-input"
+                className="form-input text-sm sm:text-base"
                 value={amount || ''}
                 onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
@@ -98,12 +98,12 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
                 step="0.01"
                 required
               />
-              <span className="input-icon input-icon-right text-gray-400 font-medium">
+              <span className="input-icon input-icon-right text-gray-400 font-medium text-xs sm:text-sm">
                 USD
               </span>
             </div>
             {checkoutData?.minimum_amount && (
-              <p className="text-xs text-gray-500">
+              <p className="text-[10px] sm:text-xs text-gray-500">
                 Minimum: ${checkoutData.minimum_amount.toFixed(2)}
                 {checkoutData?.maximum_amount && ` • Maximum: $${checkoutData.maximum_amount.toFixed(2)}`}
               </p>
@@ -114,16 +114,16 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
         {/* Fixed Amount Display (if not PWYW) */}
         {!showAmountInput && checkoutData && (
           <div className="amount-display">
-            <span className="amount-value">
+            <span className="amount-value text-xl sm:text-2xl">
               ${checkoutData.amount_usd.toFixed(2)}
             </span>
-            <span className="amount-currency">USD</span>
+            <span className="amount-currency text-xs sm:text-sm">USD</span>
           </div>
         )}
 
         {/* Section Title */}
-        <div className="pt-3">
-          <h3 className="text-xs font-semibold text-gray-900">
+        <div className="pt-2 sm:pt-3">
+          <h3 className="text-[11px] sm:text-xs font-semibold text-gray-900">
             Enter Personal Information<span className="text-red-500 ml-0.5">*</span>
           </h3>
         </div>
@@ -132,11 +132,11 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
         <div>
           <div className="input-with-icon">
             <span className="input-icon">
-              <User className="w-4 h-4" />
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </span>
             <input
               type="text"
-              className="form-input"
+              className="form-input text-sm sm:text-base"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Full Name"
@@ -148,11 +148,11 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
         <div>
           <div className="input-with-icon">
             <span className="input-icon">
-              <Mail className="w-4 h-4" />
+              <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </span>
             <input
               type="email"
-              className={`form-input ${emailError ? 'error' : ''}`}
+              className={`form-input text-sm sm:text-base ${emailError ? 'error' : ''}`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -163,9 +163,9 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
             />
           </div>
           {emailError ? (
-            <p className="text-xs text-red-500 mt-1">Please enter a valid email address</p>
+            <p className="text-[10px] sm:text-xs text-red-500 mt-1">Please enter a valid email address</p>
           ) : (
-            <p className="helper-text">
+            <p className="helper-text text-[10px] sm:text-xs">
               We use this to send you a confirmation of your payment
             </p>
           )}
@@ -174,7 +174,7 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
         {/* Continue Button */}
         <button
           type="submit"
-          className="btn btn-primary mt-4"
+          className="btn btn-primary mt-3 sm:mt-4 text-sm sm:text-base py-2.5 sm:py-3"
           disabled={!isFormValid() || isSubmitting}
         >
           {isSubmitting ? (
@@ -185,7 +185,7 @@ export function PersonalInfoStep({ onContinue }: PersonalInfoStepProps) {
           ) : (
             <>
               Continue
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </>
           )}
         </button>
