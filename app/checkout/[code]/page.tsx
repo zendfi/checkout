@@ -4,13 +4,8 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import { useCheckoutStore } from '@/lib/store';
-import { ProgressIndicator } from '@/components/wizard/ProgressIndicator';
-import { CheckoutHeaderNew } from '@/components/wizard/CheckoutHeaderNew';
-import { PersonalInfoStep } from '@/components/wizard/PersonalInfoStep';
-import { PaymentMethodStep } from '@/components/wizard/PaymentMethodStep';
-import { SecurityFooter } from '@/components/wizard/SecurityFooter';
 import { OnrampCheckout } from '@/components/wizard/OnrampCheckout';
-import { Timer } from '@/components/Timer';
+import { CryptoCheckout } from '@/components/wizard/CryptoCheckout';
 import { ErrorModal } from '@/components/modals/ErrorModal';
 import { SuccessModal } from '@/components/modals/SuccessModal';
 import { CopySuccessModal } from '@/components/modals/CopySuccessModal';
@@ -29,12 +24,6 @@ export default function CheckoutPage() {
     setSuccessModalOpen,
     successModalOpen,
     paymentStatus,
-    wizardStep,
-    setWizardStep,
-    customerName,
-    setCustomerName,
-    customerEmail,
-    setCustomerEmail,
   } = useCheckoutStore();
   
   const [loading, setLoading] = useState(true);
@@ -137,14 +126,6 @@ export default function CheckoutPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleStep1Complete = () => {
-    setWizardStep(2);
-  };
-
-  const handleBackToStep1 = () => {
-    setWizardStep(1);
-  };
-
   if (loading) {
     return <LoadingState />;
   }
@@ -167,62 +148,23 @@ export default function CheckoutPage() {
   // Ultra-lightweight onramp flow
   if (checkoutData.onramp) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gray-50">
+      <>
         <OnrampCheckout />
-        
-        {/* Modals */}
         <ErrorModal />
         <SuccessModal />
         <CopySuccessModal />
-      </div>
+      </>
     );
   }
 
+  // Clean crypto checkout flow
   return (
-    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4">
-      <div className="card max-w-[420px] w-full animate-slide-up">
-        {/* Header */}
-        <CheckoutHeaderNew 
-          merchantName={checkoutData.merchant_name} 
-          network={checkoutData.solana_network} 
-        />
-
-        {/* Progress Indicator */}
-        <div className="px-4 border-b border-gray-100">
-          <ProgressIndicator currentStep={wizardStep} totalSteps={2} />
-        </div>
-
-        {/* Step Content */}
-        <div className="p-4">
-          {wizardStep === 1 && (
-            <PersonalInfoStep onContinue={handleStep1Complete} />
-          )}
-
-          {wizardStep === 2 && (
-            <PaymentMethodStep
-              onBack={handleBackToStep1}
-              customerName={customerName}
-              customerEmail={customerEmail}
-            />
-          )}
-
-          {/* Timer (only show on step 2) */}
-          {wizardStep === 2 && !isCompleted && !isExpired && (
-            <div className="mt-4">
-              <Timer expiresAt={checkoutData.expires_at} />
-            </div>
-          )}
-        </div>
-
-        {/* Security Footer */}
-        <SecurityFooter />
-      </div>
-
-      {/* Modals */}
+    <>
+      <CryptoCheckout />
       <ErrorModal />
       <SuccessModal />
       <CopySuccessModal />
       <WalletSelectorModal />
-    </div>
+    </>
   );
 }
