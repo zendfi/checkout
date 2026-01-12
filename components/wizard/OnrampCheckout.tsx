@@ -205,6 +205,9 @@ export function OnrampCheckout() {
     }
   }, [otpValue, step]);
 
+  // Get NGN amount - use stored amount_ngn or estimate from USD
+  const ngnAmount = checkoutData?.amount_ngn || Math.round(amount * 1500);
+
   if (!checkoutData) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
@@ -218,7 +221,7 @@ export function OnrampCheckout() {
       {/* Header */}
       <div className="text-center mb-6">
         <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
-          ${amount.toFixed(2)}
+          ₦{ngnAmount.toLocaleString()}
         </div>
         <div className="text-sm text-gray-500">
           {checkoutData.merchant_name}
