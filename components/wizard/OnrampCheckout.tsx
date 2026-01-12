@@ -3,25 +3,75 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useCheckoutStore } from '@/lib/store';
 import { api } from '@/lib/api';
-import { 
-  Mail, 
-  ArrowRight, 
-  Building2, 
-  Check, 
-  Copy, 
-  Loader2,
-  RefreshCw,
-  Shield,
-  ChevronLeft,
-  Sparkles
-} from 'lucide-react';
 
 type OnrampStep = 'email' | 'otp' | 'bank-details' | 'success';
+
+// Clean, professional SVG icons
+const Icons = {
+  mail: (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+    </svg>
+  ),
+  shield: (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+    </svg>
+  ),
+  bank: (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+    </svg>
+  ),
+  check: (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+    </svg>
+  ),
+  checkCircle: (
+    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  copy: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+    </svg>
+  ),
+  arrowRight: (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+    </svg>
+  ),
+  arrowLeft: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+    </svg>
+  ),
+  refresh: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+    </svg>
+  ),
+  loader: (
+    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+    </svg>
+  ),
+  lock: (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+    </svg>
+  ),
+};
 
 export function OnrampCheckout() {
   const { checkoutData, amount, setBankOrder, bankOrder, setSuccessModalOpen } = useCheckoutStore();
   
   const [step, setStep] = useState<OnrampStep>('email');
+  const [prevStep, setPrevStep] = useState<OnrampStep>('email');
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -29,18 +79,27 @@ export function OnrampCheckout() {
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const otpValue = otp.join('');
 
-  // Animate step transitions
-  const animateToStep = (newStep: OnrampStep) => {
-    setIsAnimating(true);
+  const steps: OnrampStep[] = ['email', 'otp', 'bank-details', 'success'];
+
+  // Slide transition between steps
+  const goToStep = (newStep: OnrampStep, direction?: 'left' | 'right') => {
+    const currentIndex = steps.indexOf(step);
+    const newIndex = steps.indexOf(newStep);
+    const dir = direction || (newIndex > currentIndex ? 'left' : 'right');
+    
+    setSlideDirection(dir);
+    setIsTransitioning(true);
+    
     setTimeout(() => {
+      setPrevStep(step);
       setStep(newStep);
-      setIsAnimating(false);
-    }, 150);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 200);
   };
 
   // Resend cooldown timer
@@ -60,7 +119,7 @@ export function OnrampCheckout() {
       try {
         const status = await api.getPaymentStatus(bankOrder.payment_id || checkoutData?.payment_id || '');
         if (status.status === 'confirmed') {
-          animateToStep('success');
+          goToStep('success');
           setTimeout(() => setSuccessModalOpen(true), 800);
           clearInterval(pollInterval);
         }
@@ -103,7 +162,7 @@ export function OnrampCheckout() {
         payment_link_id: checkoutData.payment_link_id?.toString() || null,
         amount_ngn: checkoutData.amount_ngn,
       });
-      animateToStep('otp');
+      goToStep('otp');
       setResendCooldown(60);
     } catch (err) {
       setError((err as Error).message || 'Failed to send verification code');
@@ -119,7 +178,6 @@ export function OnrampCheckout() {
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
 
-    // Auto-advance to next input
     if (value && index < 3) {
       otpRefs.current[index + 1]?.focus();
     }
@@ -160,7 +218,6 @@ export function OnrampCheckout() {
 
       setBankOrder(order);
 
-      // Update payment_id if returned
       if (order.payment_id && checkoutData) {
         useCheckoutStore.setState(state => ({
           checkoutData: state.checkoutData ? {
@@ -170,7 +227,7 @@ export function OnrampCheckout() {
         }));
       }
 
-      animateToStep('bank-details');
+      goToStep('bank-details');
     } catch (err) {
       setError((err as Error).message || 'Invalid verification code');
       setOtp(['', '', '', '']);
@@ -206,10 +263,7 @@ export function OnrampCheckout() {
   const handleCopy = useCallback((text: string, type: string) => {
     navigator.clipboard.writeText(text);
     setCopied(type);
-    // Trigger haptic feedback if available
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
-    }
+    if (navigator.vibrate) navigator.vibrate(30);
     setTimeout(() => setCopied(null), 2000);
   }, []);
 
@@ -220,32 +274,40 @@ export function OnrampCheckout() {
     }
   }, [otpValue, step]);
 
-  // Get NGN amount - use stored amount_ngn or estimate from USD
   const ngnAmount = checkoutData?.amount_ngn || Math.round(amount * 1500);
 
   if (!checkoutData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-          <p className="text-sm text-gray-500">Loading checkout...</p>
+          <div className="text-indigo-500">{Icons.loader}</div>
+          <p className="text-sm text-gray-500">Loading...</p>
         </div>
       </div>
     );
   }
 
+  // Slide animation classes
+  const getSlideClasses = () => {
+    if (isTransitioning) {
+      return slideDirection === 'left' 
+        ? 'translate-x-[-20px] opacity-0' 
+        : 'translate-x-[20px] opacity-0';
+    }
+    return 'translate-x-0 opacity-100';
+  };
+
   return (
-    <div className="w-full min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
-      {/* Safe area top spacer */}
+    <div className="w-full min-h-screen flex flex-col bg-[#FAFBFC]">
       <div className="h-safe-top" />
       
-      {/* Header Section - Fixed at top on mobile */}
-      <div className="flex-shrink-0 pt-6 sm:pt-10 pb-4 px-4">
-        {/* Merchant Badge */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full shadow-sm border border-gray-100">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-white">
+      {/* Header */}
+      <div className="flex-shrink-0 pt-8 sm:pt-12 pb-6 px-5">
+        {/* Merchant */}
+        <div className="flex justify-center mb-5">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-gray-100">
+            <div className="w-5 h-5 rounded-full bg-gray-900 flex items-center justify-center">
+              <span className="text-[10px] font-semibold text-white">
                 {checkoutData.merchant_name.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -253,9 +315,9 @@ export function OnrampCheckout() {
           </div>
         </div>
 
-        {/* Amount - Large and prominent */}
+        {/* Amount */}
         <div className="text-center">
-          <div className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+          <div className="text-[40px] sm:text-5xl font-semibold text-gray-900 tracking-tight">
             ₦{ngnAmount.toLocaleString()}
           </div>
           {checkoutData.description && (
@@ -265,22 +327,22 @@ export function OnrampCheckout() {
           )}
         </div>
 
-        {/* Progress indicator */}
-        <div className="flex justify-center gap-2 mt-6">
-          {['email', 'otp', 'bank-details', 'success'].map((s, i) => {
-            const stepIndex = ['email', 'otp', 'bank-details', 'success'].indexOf(step);
+        {/* Progress */}
+        <div className="flex justify-center gap-1.5 mt-6">
+          {steps.map((s, i) => {
+            const stepIndex = steps.indexOf(step);
             const isActive = s === step;
             const isPast = i < stepIndex;
             
             return (
               <div
                 key={s}
-                className={`h-1 rounded-full transition-all duration-500 ease-out ${
+                className={`h-1 rounded-full transition-all duration-300 ${
                   isActive 
-                    ? 'w-8 bg-indigo-500' 
+                    ? 'w-6 bg-gray-900' 
                     : isPast
-                      ? 'w-2 bg-indigo-400'
-                      : 'w-2 bg-gray-200'
+                      ? 'w-1.5 bg-gray-400'
+                      : 'w-1.5 bg-gray-200'
                 }`}
               />
             );
@@ -288,25 +350,22 @@ export function OnrampCheckout() {
         </div>
       </div>
 
-      {/* Main Content - Centered and grows to fill space */}
-      <div className="flex-1 flex items-center justify-center px-4 py-4">
+      {/* Content */}
+      <div className="flex-1 flex items-start sm:items-center justify-center px-5 py-4">
         <div 
-          className={`w-full max-w-[400px] transition-all duration-150 ${
-            isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-          }`}
+          className={`w-full max-w-[400px] transition-all duration-200 ease-out ${getSlideClasses()}`}
         >
-          {/* Card */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             
             {/* Email Step */}
             {step === 'email' && (
-              <form onSubmit={handleEmailSubmit} className="p-6 sm:p-8">
+              <form onSubmit={handleEmailSubmit} className="p-6">
                 <div className="text-center mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <Mail className="w-7 h-7 text-indigo-500" />
+                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+                    {Icons.mail}
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">Enter your email</h2>
-                  <p className="text-sm text-gray-500 mt-1">We'll send a quick verification code</p>
+                  <h2 className="text-base font-semibold text-gray-900">Enter your email</h2>
+                  <p className="text-sm text-gray-500 mt-1">We'll send you a verification code</p>
                 </div>
 
                 <div className="space-y-4">
@@ -319,25 +378,22 @@ export function OnrampCheckout() {
                         setEmailError('');
                       }}
                       placeholder="you@example.com"
-                      className={`w-full px-4 py-4 text-base border-2 rounded-2xl focus:outline-none focus:ring-0 transition-all ${
+                      className={`w-full px-4 py-3.5 text-base border rounded-xl focus:outline-none transition-colors ${
                         emailError 
-                          ? 'border-red-300 bg-red-50/50' 
-                          : 'border-gray-100 focus:border-indigo-500 bg-gray-50/50 focus:bg-white'
+                          ? 'border-red-200 bg-red-50/50' 
+                          : 'border-gray-200 focus:border-gray-900 bg-white'
                       }`}
                       autoFocus
                       autoComplete="email"
                       inputMode="email"
                     />
                     {emailError && (
-                      <p className="text-xs text-red-500 mt-2 ml-1 flex items-center gap-1">
-                        <span className="w-1 h-1 rounded-full bg-red-500" />
-                        {emailError}
-                      </p>
+                      <p className="text-xs text-red-500 mt-2">{emailError}</p>
                     )}
                   </div>
 
                   {error && (
-                    <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
+                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
                       <p className="text-sm text-red-600">{error}</p>
                     </div>
                   )}
@@ -345,14 +401,14 @@ export function OnrampCheckout() {
                   <button
                     type="submit"
                     disabled={isLoading || !email.trim()}
-                    className="w-full py-4 bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-semibold rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 disabled:shadow-none active:scale-[0.98]"
+                    className="w-full py-3.5 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <div className="text-white">{Icons.loader}</div>
                     ) : (
                       <>
                         Continue
-                        <ArrowRight className="w-5 h-5" />
+                        {Icons.arrowRight}
                       </>
                     )}
                   </button>
@@ -362,28 +418,28 @@ export function OnrampCheckout() {
 
             {/* OTP Step */}
             {step === 'otp' && (
-              <div className="p-6 sm:p-8">
+              <div className="p-6">
                 <button
-                  onClick={() => animateToStep('email')}
-                  className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4 -ml-1 active:scale-95 transition-transform"
+                  onClick={() => goToStep('email', 'right')}
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5 transition-colors"
                 >
-                  <ChevronLeft className="w-5 h-5" />
-                  Back
+                  {Icons.arrowLeft}
+                  <span>Back</span>
                 </button>
 
                 <div className="text-center mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <Shield className="w-7 h-7 text-green-500" />
+                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+                    {Icons.shield}
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">Check your email</h2>
+                  <h2 className="text-base font-semibold text-gray-900">Verify your email</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    We sent a code to <span className="font-medium text-gray-700">{email}</span>
+                    Enter the code sent to <span className="font-medium text-gray-700">{email}</span>
                   </p>
                 </div>
 
                 <div className="space-y-5">
-                  {/* OTP Inputs - Larger for mobile */}
-                  <div className="flex justify-center gap-3 sm:gap-4" onPaste={handleOtpPaste}>
+                  {/* OTP Inputs */}
+                  <div className="flex justify-center gap-3" onPaste={handleOtpPaste}>
                     {otp.map((digit, index) => (
                       <input
                         key={index}
@@ -395,10 +451,10 @@ export function OnrampCheckout() {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className={`w-14 h-16 sm:w-16 sm:h-18 text-center text-2xl font-bold border-2 rounded-2xl transition-all focus:outline-none ${
+                        className={`w-14 h-14 text-center text-xl font-semibold border rounded-xl transition-colors focus:outline-none ${
                           digit 
-                            ? 'border-indigo-500 bg-indigo-50/50' 
-                            : 'border-gray-100 bg-gray-50/50 focus:border-indigo-500 focus:bg-white'
+                            ? 'border-gray-900 bg-gray-50' 
+                            : 'border-gray-200 focus:border-gray-900'
                         }`}
                         autoFocus={index === 0}
                       />
@@ -406,31 +462,31 @@ export function OnrampCheckout() {
                   </div>
 
                   {error && (
-                    <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
+                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
                       <p className="text-sm text-red-600 text-center">{error}</p>
                     </div>
                   )}
 
                   {isLoading && (
-                    <div className="flex items-center justify-center gap-3 py-3">
-                      <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-gray-600">Verifying...</span>
+                    <div className="flex items-center justify-center gap-2 py-2">
+                      <div className="text-gray-500">{Icons.loader}</div>
+                      <span className="text-sm text-gray-600">Verifying...</span>
                     </div>
                   )}
 
                   {/* Resend */}
-                  <div className="text-center pt-2">
+                  <div className="text-center">
                     {resendCooldown > 0 ? (
                       <p className="text-sm text-gray-400">
-                        Resend code in <span className="font-medium text-gray-600">{resendCooldown}s</span>
+                        Resend in <span className="font-medium">{resendCooldown}s</span>
                       </p>
                     ) : (
                       <button
                         onClick={handleResendOtp}
                         disabled={isLoading}
-                        className="text-sm text-indigo-500 hover:text-indigo-600 font-medium flex items-center gap-2 mx-auto active:scale-95 transition-transform"
+                        className="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1.5 mx-auto transition-colors"
                       >
-                        <RefreshCw className="w-4 h-4" />
+                        {Icons.refresh}
                         Resend code
                       </button>
                     )}
@@ -441,120 +497,98 @@ export function OnrampCheckout() {
 
             {/* Bank Details Step */}
             {step === 'bank-details' && bankOrder && (
-              <div className="p-6 sm:p-8">
+              <div className="p-6">
                 <div className="text-center mb-5">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <Building2 className="w-7 h-7 text-green-600" />
+                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+                    {Icons.bank}
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">Complete your transfer</h2>
+                  <h2 className="text-base font-semibold text-gray-900">Complete transfer</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    Send exactly <span className="font-bold text-green-600">₦{bankOrder.fiat_amount.toLocaleString()}</span>
+                    Send <span className="font-semibold text-gray-900">₦{bankOrder.fiat_amount.toLocaleString()}</span> to complete
                   </p>
                 </div>
 
-                {/* Bank Details Card */}
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-5 space-y-4 mb-5 border border-gray-100">
-                  {/* Bank Name */}
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Bank</span>
-                    <span className="text-sm font-semibold text-gray-900">{bankOrder.bank_name}</span>
+                {/* Bank Details */}
+                <div className="bg-gray-50 rounded-xl p-4 space-y-3 mb-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">Bank</span>
+                    <span className="font-medium text-gray-900">{bankOrder.bank_name}</span>
                   </div>
                   
-                  {/* Account Name */}
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Account Name</span>
-                    <span className="text-sm font-medium text-gray-900 text-right max-w-[200px] truncate">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">Account Name</span>
+                    <span className="font-medium text-gray-900 text-right max-w-[180px] truncate">
                       {bankOrder.bank_account_name}
                     </span>
                   </div>
 
-                  {/* Account Number - Prominent */}
-                  <div className="border-t border-gray-200 pt-4">
+                  <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">Account Number</span>
                       <button
                         onClick={() => handleCopy(bankOrder.bank_account_number, 'account')}
-                        className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl border border-gray-200 hover:border-indigo-300 active:scale-95 transition-all shadow-sm"
+                        className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-gray-200 hover:border-gray-300 active:scale-[0.98] transition-all"
                       >
-                        <span className="text-lg font-mono font-bold text-gray-900 tracking-wide">
+                        <span className="text-base font-mono font-semibold text-gray-900">
                           {bankOrder.bank_account_number}
                         </span>
-                        {copied === 'account' ? (
-                          <Check className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <Copy className="w-5 h-5 text-gray-400" />
-                        )}
+                        <span className={copied === 'account' ? 'text-green-500' : 'text-gray-400'}>
+                          {copied === 'account' ? Icons.check : Icons.copy}
+                        </span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Amount - Copyable */}
-                  <div className="border-t border-gray-200 pt-4">
+                  <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">Amount</span>
                       <button
                         onClick={() => handleCopy(bankOrder.fiat_amount.toString(), 'amount')}
-                        className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-xl border border-green-200 hover:border-green-300 active:scale-95 transition-all"
+                        className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-gray-200 hover:border-gray-300 active:scale-[0.98] transition-all"
                       >
-                        <span className="text-lg font-bold text-green-600">
+                        <span className="text-base font-semibold text-gray-900">
                           ₦{bankOrder.fiat_amount.toLocaleString()}
                         </span>
-                        {copied === 'amount' ? (
-                          <Check className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <Copy className="w-5 h-5 text-green-400" />
-                        )}
+                        <span className={copied === 'amount' ? 'text-green-500' : 'text-gray-400'}>
+                          {copied === 'amount' ? Icons.check : Icons.copy}
+                        </span>
                       </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Waiting indicator */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4 mb-5">
+                {/* Status */}
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-                    </div>
+                    <div className="text-blue-500">{Icons.loader}</div>
                     <div>
-                      <p className="text-sm font-semibold text-blue-700">Waiting for your transfer</p>
-                      <p className="text-xs text-blue-600 mt-0.5">
-                        We'll confirm automatically once received
-                      </p>
+                      <p className="text-sm font-medium text-blue-700">Waiting for transfer</p>
+                      <p className="text-xs text-blue-600 mt-0.5">We'll confirm once received</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Tips */}
-                <div className="space-y-2">
-                  {[
-                    'Transfer the exact amount shown',
-                    'Use your bank app or USSD code',
-                    'Account expires in 30 minutes'
-                  ].map((tip, i) => (
-                    <div key={i} className="flex items-center gap-2.5 text-xs text-gray-500">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
-                      <span>{tip}</span>
-                    </div>
-                  ))}
+                <div className="space-y-1.5 text-xs text-gray-500">
+                  <p>• Transfer the exact amount shown</p>
+                  <p>• Use your bank app or USSD</p>
+                  <p>• Account expires in 30 minutes</p>
                 </div>
               </div>
             )}
 
             {/* Success Step */}
             {step === 'success' && (
-              <div className="p-8 sm:p-10 text-center">
-                <div className="relative w-20 h-20 mx-auto mb-5">
-                  <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-25" />
-                  <div className="relative w-full h-full bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
-                    <Check className="w-10 h-10 text-white" strokeWidth={3} />
-                  </div>
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 text-green-500">
+                  {Icons.checkCircle}
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Payment Successful!</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">Payment Successful</h2>
                 <p className="text-sm text-gray-500">Thank you for your payment</p>
                 
-                <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full">
-                  <Sparkles className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium text-green-700">₦{bankOrder?.fiat_amount.toLocaleString()} received</span>
+                <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  ₦{bankOrder?.fiat_amount.toLocaleString()} received
                 </div>
               </div>
             )}
@@ -562,15 +596,14 @@ export function OnrampCheckout() {
         </div>
       </div>
 
-      {/* Footer - Fixed at bottom */}
-      <div className="flex-shrink-0 pb-6 pt-4 px-4">
-        <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
-          <Shield className="w-3.5 h-3.5" />
-          <span>Secured by <span className="font-medium text-gray-500">ZendFi</span></span>
+      {/* Footer */}
+      <div className="flex-shrink-0 pb-6 pt-4 px-5">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
+          {Icons.lock}
+          <span>Secured by ZendFi</span>
         </div>
       </div>
       
-      {/* Safe area bottom spacer */}
       <div className="h-safe-bottom" />
     </div>
   );
