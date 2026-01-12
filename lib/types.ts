@@ -17,6 +17,8 @@ export interface HostedCheckoutData {
   suggested_amount: number | null;
   onramp: boolean;
   payment_link_id: string | null;
+  /** Original NGN amount for exact PAJ conversion (if set via NGN calculator) */
+  amount_ngn?: number;
 }
 
 export interface PaymentLinkResponse {
@@ -84,6 +86,8 @@ export interface OnrampInitiateRequest {
   customer_email: string;
   fiat_amount: number;
   payment_link_id: string | null;
+  /** Original NGN amount for exact PAJ conversion */
+  amount_ngn?: number;
 }
 
 export interface OnrampCreateOrderRequest {
@@ -94,6 +98,8 @@ export interface OnrampCreateOrderRequest {
   payment_link_id: string | null;
   payment_intent_id: string | null;
   webhook_url: string | null;
+  /** Original NGN amount for exact PAJ conversion */
+  amount_ngn?: number;
 }
 
 export interface OnrampOrderResponse {

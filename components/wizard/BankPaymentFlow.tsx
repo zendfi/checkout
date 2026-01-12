@@ -56,6 +56,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
           customer_email: customerEmail,
           fiat_amount: amount,
           payment_link_id: checkoutData.payment_link_id?.toString() || null,
+          amount_ngn: checkoutData.amount_ngn, // Pass original NGN for exact conversion
         });
         setStep('verify-otp');
         setResendCooldown(60);
@@ -112,6 +113,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
         customer_email: customerEmail,
         fiat_amount: amount,
         payment_link_id: checkoutData.payment_link_id?.toString() || null,
+        amount_ngn: checkoutData.amount_ngn, // Pass original NGN for exact conversion
       });
       setResendCooldown(60);
       setOtp(['', '', '', '']);
@@ -136,6 +138,7 @@ export function BankPaymentFlow({ onBack, customerEmail }: BankPaymentFlowProps)
         payment_link_id: checkoutData.payment_link_id?.toString() || null,
         payment_intent_id: null,
         webhook_url: null,
+        amount_ngn: checkoutData.amount_ngn, // Pass original NGN for exact conversion
       });
       
       setBankOrder(order);
