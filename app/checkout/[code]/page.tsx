@@ -160,6 +160,9 @@ export default function CheckoutPage() {
   const isExpired = new Date(checkoutData.expires_at) < new Date();
   const isCompleted = paymentStatus?.status === 'confirmed';
 
+  // Debug: log onramp value
+  console.log('Checkout data - onramp:', checkoutData.onramp, 'full data:', checkoutData);
+
   if (isExpired && !isCompleted) {
     return <ErrorState message="This payment has expired. Please request a new payment link." />;
   }
