@@ -9,6 +9,7 @@ import { CheckoutHeaderNew } from '@/components/wizard/CheckoutHeaderNew';
 import { PersonalInfoStep } from '@/components/wizard/PersonalInfoStep';
 import { PaymentMethodStep } from '@/components/wizard/PaymentMethodStep';
 import { SecurityFooter } from '@/components/wizard/SecurityFooter';
+import { OnrampCheckout } from '@/components/wizard/OnrampCheckout';
 import { Timer } from '@/components/Timer';
 import { ErrorModal } from '@/components/modals/ErrorModal';
 import { SuccessModal } from '@/components/modals/SuccessModal';
@@ -161,6 +162,20 @@ export default function CheckoutPage() {
 
   if (isExpired && !isCompleted) {
     return <ErrorState message="This payment has expired. Please request a new payment link." />;
+  }
+
+  // Ultra-lightweight onramp flow
+  if (checkoutData.onramp) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gray-50">
+        <OnrampCheckout />
+        
+        {/* Modals */}
+        <ErrorModal />
+        <SuccessModal />
+        <CopySuccessModal />
+      </div>
+    );
   }
 
   return (
