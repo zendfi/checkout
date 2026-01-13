@@ -600,7 +600,8 @@ export function OnrampCheckout() {
       <div className="flex-shrink-0 pb-6 pt-4 px-5">
         <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
           {Icons.lock}
-          <span>Secured by ZendFi</span>
+          <span>Secured by</span>
+          <img src="/img/zendfi-logo.png" alt="ZendFi" className="h-3.5 opacity-60" />
         </div>
       </div>
       
