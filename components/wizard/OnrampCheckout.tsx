@@ -601,7 +601,9 @@ export function OnrampCheckout() {
         <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
           {Icons.lock}
           <span>Secured by</span>
-          <img src="/img/zendfi-logo.png" alt="ZendFi" className="h-3.5 opacity-80" />
+          <a href="https://zendfi.tech" target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity">
+            <img src="/img/zendfi-logo.png" alt="ZendFi" className="h-3.5 opacity-80" />
+          </a>
         </div>
       </div>
       
