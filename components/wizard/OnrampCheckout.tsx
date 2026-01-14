@@ -597,7 +597,7 @@ export function OnrampCheckout() {
       </div>
 
       {/* Footer */}
-      <div className="flex-shrink-0 pb-6 pt-4 px-5">
+      <div className="flex-shrink-0 pb-3 pt-3 px-5">
         <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
           {Icons.lock}
           <span>Secured by</span>
