@@ -301,7 +301,7 @@ export function CryptoCheckout() {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-[#FAFBFC]">
+    <div className="w-full min-h-screen bg-[#FAFBFC]">
       <div className="h-safe-top" />
       
       {/* Header */}
@@ -360,7 +360,7 @@ export function CryptoCheckout() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex items-start sm:items-center justify-center px-5 py-4">
+      <div className="flex items-start justify-center px-5 py-4">
         <div 
           className={`w-full max-w-[400px] transition-all duration-200 ease-out ${getSlideClasses()}`}
         >
