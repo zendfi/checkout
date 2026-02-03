@@ -12,6 +12,18 @@ import {
 } from '@/lib/wallet';
 import { Transaction } from '@solana/web3.js';
 
+// Wallet logo mappings
+const WALLET_LOGOS: Record<string, string> = {
+  phantom: '/svg/phantom.svg',
+  solflare: '/svg/solfare.svg',
+  backpack: '/svg/phantom.svg', // fallback
+  coinbase: '/svg/coinbase.svg',
+  trust: '/svg/trust.svg',
+  glow: '/svg/phantom.svg', // fallback
+  slope: '/svg/phantom.svg', // fallback
+  wallet: '/svg/phantom.svg', // fallback for generic wallet
+};
+
 type CryptoStep = 'info' | 'method' | 'wallet-pay' | 'qr-pay' | 'success';
 
 // Clean, professional SVG icons
@@ -489,18 +501,19 @@ export function CryptoCheckout() {
                   <div className="mt-5 pt-5 border-t border-gray-100">
                     <p className="text-xs text-gray-500 mb-3">Detected wallets</p>
                     <div className="flex flex-wrap gap-2">
-                      {availableWallets.slice(0, 4).map((w) => (
-                        <button
-                          key={w.name}
-                          onClick={() => handleWalletConnect(w)}
-                          className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                          {w.icon && (
-                            <img src={w.icon} alt={w.name} className="w-5 h-5 rounded" />
-                          )}
-                          <span className="text-sm font-medium text-gray-700">{w.name}</span>
-                        </button>
-                      ))}
+                      {availableWallets.slice(0, 4).map((w) => {
+                        const logoPath = WALLET_LOGOS[w.icon] || WALLET_LOGOS.phantom;
+                        return (
+                          <button
+                            key={w.name}
+                            onClick={() => handleWalletConnect(w)}
+                            className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <img src={logoPath} alt={w.name} className="w-5 h-5 rounded" />
+                            <span className="text-sm font-medium text-gray-700">{w.name}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
