@@ -507,7 +507,7 @@ export function CryptoCheckout() {
                           <button
                             key={w.name}
                             onClick={() => handleWalletConnect(w)}
-                            className="w-14 h-14 bg-white hover:bg-gray-50 rounded-2xl transition-colors overflow-hidden"
+                            className="w-12 h-12 bg-white hover:bg-gray-50 rounded-2xl transition-colors overflow-hidden"
                             title={w.name}
                             aria-label={`Connect with ${w.name}`}
                           >
