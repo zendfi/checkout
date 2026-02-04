@@ -507,11 +507,11 @@ export function CryptoCheckout() {
                           <button
                             key={w.name}
                             onClick={() => handleWalletConnect(w)}
-                            className="w-16 h-16 p-3 bg-white hover:bg-gray-50 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
+                            className="w-16 h-16 bg-white hover:bg-gray-50 rounded-2xl transition-colors overflow-hidden"
                             title={w.name}
                             aria-label={`Connect with ${w.name}`}
                           >
-                            <img src={logoPath} alt={w.name} className="w-full h-full object-contain" />
+                            <img src={logoPath} alt={w.name} className="w-full h-full object-cover" />
                           </button>
                         );
                       })}
