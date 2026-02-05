@@ -16,12 +16,12 @@ import { Transaction } from '@solana/web3.js';
 const WALLET_LOGOS: Record<string, string> = {
   phantom: '/svg/phantom.svg',
   solflare: '/svg/solfare.svg',
-  backpack: '/svg/phantom.svg', // fallback
+  backpack: '/svg/backpack.svg', // fallback
   coinbase: '/svg/coinbase.svg',
   trust: '/svg/trust.svg',
-  glow: '/svg/phantom.svg', // fallback
-  slope: '/svg/phantom.svg', // fallback
-  wallet: '/svg/phantom.svg', // fallback for generic wallet
+  glow: '/svg/wallet-connect.svg', // fallback
+  slope: '/svg/wallet-connect.svg', // fallback
+  wallet: '/svg/wallet-connect.svg', // fallback for generic wallet
 };
 
 type CryptoStep = 'info' | 'method' | 'wallet-pay' | 'qr-pay' | 'success';
