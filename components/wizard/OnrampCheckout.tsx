@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useCheckoutStore } from '@/lib/store';
 import { api } from '@/lib/api';
 
-type OnrampStep = 'email' | 'otp' | 'bank-details' | 'success';
+type OnrampStep = 'email' | 'otp' | 'bank-details' | 'under-review' | 'success';
 
 // Clean, professional SVG icons
 const Icons = {
@@ -64,6 +64,16 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
     </svg>
   ),
+  clock: (
+    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  mail2: (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+    </svg>
+  ),
 };
 
 export function OnrampCheckout() {
@@ -80,11 +90,13 @@ export function OnrampCheckout() {
   const [copied, setCopied] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [pollStartTime, setPollStartTime] = useState<number | null>(null);
+  const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const otpValue = otp.join('');
 
-  const steps: OnrampStep[] = ['email', 'otp', 'bank-details', 'success'];
+  const steps: OnrampStep[] = ['email', 'otp', 'bank-details', 'under-review', 'success'];
 
   // Slide transition between steps
   const goToStep = (newStep: OnrampStep, direction?: 'left' | 'right') => {
@@ -115,10 +127,19 @@ export function OnrampCheckout() {
   useEffect(() => {
     if (step !== 'bank-details' || !bankOrder) return;
 
+    // Start polling timer
+    setPollStartTime(Date.now());
+
+    // Set timeout for 15 minutes (900 seconds)
+    pollTimeoutRef.current = setTimeout(() => {
+      goToStep('under-review');
+    }, 15 * 60 * 1000); // 15 minutes
+
     const pollInterval = setInterval(async () => {
       try {
         const status = await api.getPaymentStatus(bankOrder.payment_id || checkoutData?.payment_id || '');
         if (status.status === 'confirmed') {
+          if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
           goToStep('success');
           setTimeout(() => setSuccessModalOpen(true), 800);
           clearInterval(pollInterval);
@@ -128,7 +149,10 @@ export function OnrampCheckout() {
       }
     }, 8000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      clearInterval(pollInterval);
+      if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
+    };
   }, [step, bankOrder, checkoutData, setSuccessModalOpen]);
 
   const validateEmail = (email: string): boolean => {
@@ -573,6 +597,73 @@ export function OnrampCheckout() {
                   <p>• Transfer the exact amount shown</p>
                   <p>• Use your bank app or USSD</p>
                   <p>• Account expires in 30 minutes</p>
+                </div>
+              </div>
+            )}
+
+            {/* Under Review Step */}
+            {step === 'under-review' && (
+              <div className="p-6">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500">
+                    {Icons.clock}
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Payment Under Review</h2>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    We're still processing your bank transfer. This is taking longer than usual.
+                  </p>
+                </div>
+
+                {/* What's Happening */}
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
+                  <h3 className="text-sm font-semibold text-blue-900 mb-2">What's happening?</h3>
+                  <ul className="space-y-2 text-sm text-blue-800">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-500 mt-0.5">•</span>
+                      <span>Our team has been notified and is investigating your payment</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-500 mt-0.5">•</span>
+                      <span>We're coordinating with our payment partner to locate your transfer</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-500 mt-0.5">•</span>
+                      <span>You'll receive an update via email within 24 hours</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Guarantee */}
+                <div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-green-600 mt-0.5">{Icons.checkCircle}</div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-green-900 mb-1">You're protected</h3>
+                      <p className="text-sm text-green-800">
+                        If we can't deliver your USDC, you'll receive a <strong>full refund</strong> to your bank account within 3-5 business days.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    {Icons.mail2}
+                    <span>Need help?</span>
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Contact our support team if you have questions:
+                  </p>
+                  <a 
+                    href={`mailto:dispute@zendfi.tech?subject=Payment Review - ${bankOrder?.payment_id || ''}&body=Order ID: ${bankOrder?.payment_id || ''}%0AEmail: ${email}`}
+                    className="block w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors text-center"
+                  >
+                    Email Support
+                  </a>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Reference: {bankOrder?.payment_id?.slice(0, 8) || 'N/A'}
+                  </p>
                 </div>
               </div>
             )}
