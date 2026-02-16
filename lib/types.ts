@@ -90,9 +90,22 @@ export interface OnrampInitiateRequest {
   amount_ngn?: number;
 }
 
+export interface OnrampInitiateResponse {
+  customer_wallet: {
+    id: string;
+    customer_email: string;
+    wallet_address: string;
+  };
+  session_initiated: boolean;
+  message: string;
+  session_id: string;
+  proxy_email: string;
+}
+
 export interface OnrampCreateOrderRequest {
   customer_email: string;
-  otp: string;
+  otp?: string; // Optional - for legacy flow
+  session_id?: string; // Optional - for centralized flow
   fiat_amount: number;
   currency: string;
   payment_link_id: string | null;

@@ -7,6 +7,7 @@ import {
   PaymentStatus,
   CustomerInfo,
   OnrampInitiateRequest,
+  OnrampInitiateResponse,
   OnrampCreateOrderRequest,
   OnrampOrderResponse,
 } from './types';
@@ -199,7 +200,7 @@ export const api = {
   },
 
   // Onramp: Initiate (send OTP)
-  async onrampInitiate(request: OnrampInitiateRequest): Promise<void> {
+  async onrampInitiate(request: OnrampInitiateRequest): Promise<OnrampInitiateResponse> {
     const response = await fetch(`${API_BASE}/api/v1/onramp/initiate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -207,8 +208,9 @@ export const api = {
     });
     if (!response.ok) {
       const data = await response.json();
-      throw new ApiError(response.status, data.error || 'Failed to send OTP');
+      throw new ApiError(response.status, data.error || 'Failed to initiate session');
     }
+    return response.json();
   },
 
   // Onramp: Create order
