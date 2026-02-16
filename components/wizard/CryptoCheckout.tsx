@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useCheckoutStore } from '@/lib/store';
 import { api } from '@/lib/api';
 import { QRCodeDisplay } from './QRCodeDisplay';
-import { 
-  getAvailableWallets, 
-  isMobileDevice, 
+import {
+  getAvailableWallets,
+  isMobileDevice,
   connectToWallet,
-  DetectedWallet 
+  DetectedWallet
 } from '@/lib/wallet';
 import { Transaction } from '@solana/web3.js';
 
@@ -98,9 +98,9 @@ const Icons = {
 };
 
 export function CryptoCheckout() {
-  const { 
-    checkoutData, 
-    amount, 
+  const {
+    checkoutData,
+    amount,
     setAmount,
     wallet,
     setWallet,
@@ -108,7 +108,7 @@ export function CryptoCheckout() {
     setErrorModal,
     setWalletSelectorOpen,
   } = useCheckoutStore();
-  
+
   const [step, setStep] = useState<CryptoStep>('info');
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -119,7 +119,7 @@ export function CryptoCheckout() {
   const [copied, setCopied] = useState<string | null>(null);
   const [availableWallets, setAvailableWallets] = useState<DetectedWallet[]>([]);
   const [processingMessage, setProcessingMessage] = useState('');
-  
+
   const steps: CryptoStep[] = ['info', 'method', 'wallet-pay', 'qr-pay', 'success'];
 
   // Initialize
@@ -136,10 +136,10 @@ export function CryptoCheckout() {
     const currentIndex = steps.indexOf(step);
     const newIndex = steps.indexOf(newStep);
     const dir = direction || (newIndex > currentIndex ? 'left' : 'right');
-    
+
     setSlideDirection(dir);
     setIsTransitioning(true);
-    
+
     setTimeout(() => {
       setStep(newStep);
       setTimeout(() => setIsTransitioning(false), 50);
@@ -154,12 +154,12 @@ export function CryptoCheckout() {
   const handleInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError('');
-    
+
     if (!email.trim()) {
       setEmailError('Please enter your email');
       return;
     }
-    
+
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address');
       return;
@@ -172,7 +172,7 @@ export function CryptoCheckout() {
     try {
       const customerData: { email: string; name?: string } = { email };
       if (name.trim()) customerData.name = name.trim();
-      
+
       await api.submitCustomerInfo(checkoutData.payment_id, customerData);
       goToStep('method');
     } catch (err) {
@@ -242,7 +242,7 @@ export function CryptoCheckout() {
       await api.submitGaslessTransaction(checkoutData.payment_id, base64Tx);
 
       setProcessingMessage('Confirming...');
-      
+
       const startTime = Date.now();
       while (Date.now() - startTime < 60000) {
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -257,7 +257,7 @@ export function CryptoCheckout() {
           throw new Error(`Payment ${status.status}`);
         }
       }
-      
+
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
@@ -288,8 +288,8 @@ export function CryptoCheckout() {
 
   const getSlideClasses = () => {
     if (isTransitioning) {
-      return slideDirection === 'left' 
-        ? 'translate-x-[-20px] opacity-0' 
+      return slideDirection === 'left'
+        ? 'translate-x-[-20px] opacity-0'
         : 'translate-x-[20px] opacity-0';
     }
     return 'translate-x-0 opacity-100';
@@ -315,11 +315,11 @@ export function CryptoCheckout() {
   return (
     <div className="w-full min-h-screen bg-[#FAFBFC]">
       <div className="h-safe-top" />
-      
+
       {/* Header */}
-      <div className="flex-shrink-0 pt-8 sm:pt-12 pb-6 px-5">
+      <div className="flex-shrink-0 pt-6 sm:pt-8 pb-4 px-5">
         {/* Merchant */}
-        <div className="flex justify-center mb-5">
+        <div className="flex justify-center mb-3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-gray-100">
             <div className="w-5 h-5 rounded-full bg-gray-900 flex items-center justify-center">
               <span className="text-[10px] font-semibold text-white">
@@ -337,7 +337,7 @@ export function CryptoCheckout() {
 
         {/* Amount */}
         <div className="text-center">
-          <div className="text-[40px] sm:text-5xl font-semibold text-gray-900 tracking-tight">
+          <div className="text-3xl sm:text-4xl font-semibold text-gray-900 tracking-tight">
             ${amount.toFixed(2)}
           </div>
           <p className="text-sm text-gray-500 mt-1">{checkoutData.token} on Solana</p>
@@ -354,17 +354,16 @@ export function CryptoCheckout() {
             const current = currentStepIndex();
             const isActive = i === current;
             const isPast = i < current;
-            
+
             return (
               <div
                 key={i}
-                className={`h-1 rounded-full transition-all duration-300 ${
-                  isActive 
-                    ? 'w-6 bg-gray-900' 
+                className={`h-1 rounded-full transition-all duration-300 ${isActive
+                    ? 'w-6 bg-gray-900'
                     : isPast
                       ? 'w-1.5 bg-gray-400'
                       : 'w-1.5 bg-gray-200'
-                }`}
+                  }`}
               />
             );
           })}
@@ -373,16 +372,16 @@ export function CryptoCheckout() {
 
       {/* Content */}
       <div className="flex items-start justify-center px-5 py-4">
-        <div 
+        <div
           className={`w-full max-w-[400px] transition-all duration-200 ease-out ${getSlideClasses()}`}
         >
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            
+
             {/* Info Step */}
             {step === 'info' && (
-              <form onSubmit={handleInfoSubmit} className="p-6">
-                <div className="text-center mb-6">
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+              <form onSubmit={handleInfoSubmit} className="p-5">
+                <div className="text-center mb-5">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-600">
                     {Icons.user}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Your details</h2>
@@ -400,7 +399,7 @@ export function CryptoCheckout() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Full name (optional)"
-                      className="w-full pl-11 pr-4 py-3.5 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors"
+                      className="w-full pl-11 pr-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors"
                     />
                   </div>
 
@@ -418,9 +417,8 @@ export function CryptoCheckout() {
                           setEmailError('');
                         }}
                         placeholder="Email address"
-                        className={`w-full pl-11 pr-4 py-3.5 text-base border rounded-xl focus:outline-none transition-colors ${
-                          emailError ? 'border-red-200 bg-red-50/50' : 'border-gray-200 focus:border-gray-900'
-                        }`}
+                        className={`w-full pl-11 pr-4 py-3 text-base border rounded-xl focus:outline-none transition-colors ${emailError ? 'border-red-200 bg-red-50/50' : 'border-gray-200 focus:border-gray-900'
+                          }`}
                         autoComplete="email"
                         required
                       />
@@ -433,7 +431,7 @@ export function CryptoCheckout() {
                   <button
                     type="submit"
                     disabled={isLoading || !email.trim()}
-                    className="w-full py-3.5 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2 mt-2"
+                    className="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2 mt-2"
                   >
                     {isLoading ? (
                       <div className="text-white">{Icons.loader}</div>
@@ -450,16 +448,16 @@ export function CryptoCheckout() {
 
             {/* Method Selection Step */}
             {step === 'method' && (
-              <div className="p-6">
+              <div className="p-5">
                 <button
                   onClick={() => goToStep('info', 'right')}
-                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5 transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
                 >
                   {Icons.arrowLeft}
                   <span>Back</span>
                 </button>
 
-                <div className="text-center mb-6">
+                <div className="text-center mb-5">
                   <h2 className="text-base font-semibold text-gray-900">Choose payment method</h2>
                   <p className="text-sm text-gray-500 mt-1">Pay with your Solana wallet</p>
                 </div>
@@ -523,17 +521,17 @@ export function CryptoCheckout() {
 
             {/* Wallet Pay Step */}
             {step === 'wallet-pay' && wallet && (
-              <div className="p-6">
+              <div className="p-5">
                 <button
                   onClick={() => goToStep('method', 'right')}
-                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5 transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
                 >
                   {Icons.arrowLeft}
                   <span>Back</span>
                 </button>
 
-                <div className="text-center mb-5">
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+                <div className="text-center mb-4">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-600">
                     {Icons.wallet}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Confirm payment</h2>
@@ -589,16 +587,16 @@ export function CryptoCheckout() {
 
             {/* QR Pay Step */}
             {step === 'qr-pay' && (
-              <div className="p-6">
+              <div className="p-5">
                 <button
                   onClick={() => goToStep('method', 'right')}
-                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5 transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
                 >
                   {Icons.arrowLeft}
                   <span>Back</span>
                 </button>
 
-                <div className="text-center mb-5">
+                <div className="text-center mb-4">
                   <h2 className="text-base font-semibold text-gray-900">Scan to pay</h2>
                   <p className="text-sm text-gray-500 mt-1">Use your Solana wallet app</p>
                 </div>
@@ -649,7 +647,7 @@ export function CryptoCheckout() {
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-1">Payment Successful</h2>
                 <p className="text-sm text-gray-500">Thank you for your payment</p>
-                
+
                 <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                   ${amount.toFixed(2)} received
@@ -670,7 +668,7 @@ export function CryptoCheckout() {
           </a>
         </div>
       </div>
-      
+
       <div className="h-safe-bottom" />
     </div>
   );

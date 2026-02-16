@@ -78,7 +78,7 @@ const Icons = {
 
 export function OnrampCheckout() {
   const { checkoutData, amount, setBankOrder, bankOrder, setSuccessModalOpen } = useCheckoutStore();
-  
+
   const [step, setStep] = useState<OnrampStep>('email');
   const [prevStep, setPrevStep] = useState<OnrampStep>('email');
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
@@ -92,7 +92,7 @@ export function OnrampCheckout() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pollStartTime, setPollStartTime] = useState<number | null>(null);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const otpValue = otp.join('');
 
@@ -103,10 +103,10 @@ export function OnrampCheckout() {
     const currentIndex = steps.indexOf(step);
     const newIndex = steps.indexOf(newStep);
     const dir = direction || (newIndex > currentIndex ? 'left' : 'right');
-    
+
     setSlideDirection(dir);
     setIsTransitioning(true);
-    
+
     setTimeout(() => {
       setPrevStep(step);
       setStep(newStep);
@@ -163,12 +163,12 @@ export function OnrampCheckout() {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError('');
-    
+
     if (!email.trim()) {
       setEmailError('Please enter your email');
       return;
     }
-    
+
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address');
       return;
@@ -197,7 +197,7 @@ export function OnrampCheckout() {
 
   const handleOtpChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
-    
+
     const newOtp = [...otp];
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
@@ -314,8 +314,8 @@ export function OnrampCheckout() {
   // Slide animation classes
   const getSlideClasses = () => {
     if (isTransitioning) {
-      return slideDirection === 'left' 
-        ? 'translate-x-[-20px] opacity-0' 
+      return slideDirection === 'left'
+        ? 'translate-x-[-20px] opacity-0'
         : 'translate-x-[20px] opacity-0';
     }
     return 'translate-x-0 opacity-100';
@@ -324,11 +324,11 @@ export function OnrampCheckout() {
   return (
     <div className="w-full min-h-screen bg-[#FAFBFC]">
       <div className="h-safe-top" />
-      
+
       {/* Header */}
-      <div className="flex-shrink-0 pt-8 sm:pt-12 pb-6 px-5">
+      <div className="flex-shrink-0 pt-6 sm:pt-8 pb-4 px-5">
         {/* Merchant */}
-        <div className="flex justify-center mb-5">
+        <div className="flex justify-center mb-3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-gray-100">
             <div className="w-5 h-5 rounded-full bg-gray-900 flex items-center justify-center">
               <span className="text-[10px] font-semibold text-white">
@@ -341,7 +341,7 @@ export function OnrampCheckout() {
 
         {/* Amount */}
         <div className="text-center">
-          <div className="text-[40px] sm:text-5xl font-semibold text-gray-900 tracking-tight">
+          <div className="text-3xl sm:text-4xl font-semibold text-gray-900 tracking-tight">
             ₦{ngnAmount.toLocaleString()}
           </div>
           {checkoutData.description && (
@@ -352,22 +352,21 @@ export function OnrampCheckout() {
         </div>
 
         {/* Progress */}
-        <div className="flex justify-center gap-1.5 mt-6">
+        <div className="flex justify-center gap-1.5 mt-4">
           {steps.map((s, i) => {
             const stepIndex = steps.indexOf(step);
             const isActive = s === step;
             const isPast = i < stepIndex;
-            
+
             return (
               <div
                 key={s}
-                className={`h-1 rounded-full transition-all duration-300 ${
-                  isActive 
-                    ? 'w-6 bg-gray-900' 
+                className={`h-1 rounded-full transition-all duration-300 ${isActive
+                    ? 'w-6 bg-gray-900'
                     : isPast
                       ? 'w-1.5 bg-gray-400'
                       : 'w-1.5 bg-gray-200'
-                }`}
+                  }`}
               />
             );
           })}
@@ -376,16 +375,16 @@ export function OnrampCheckout() {
 
       {/* Content */}
       <div className="flex items-start justify-center px-5 py-4">
-        <div 
+        <div
           className={`w-full max-w-[400px] transition-all duration-200 ease-out ${getSlideClasses()}`}
         >
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            
+
             {/* Email Step */}
             {step === 'email' && (
-              <form onSubmit={handleEmailSubmit} className="p-6">
-                <div className="text-center mb-6">
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+              <form onSubmit={handleEmailSubmit} className="p-5">
+                <div className="text-center mb-4">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-600">
                     {Icons.mail}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Enter your email</h2>
@@ -402,11 +401,10 @@ export function OnrampCheckout() {
                         setEmailError('');
                       }}
                       placeholder="you@example.com"
-                      className={`w-full px-4 py-3.5 text-base border rounded-xl focus:outline-none transition-colors ${
-                        emailError 
-                          ? 'border-red-200 bg-red-50/50' 
+                      className={`w-full px-4 py-3 text-base border rounded-xl focus:outline-none transition-colors ${emailError
+                          ? 'border-red-200 bg-red-50/50'
                           : 'border-gray-200 focus:border-gray-900 bg-white'
-                      }`}
+                        }`}
                       autoFocus
                       autoComplete="email"
                       inputMode="email"
@@ -425,7 +423,7 @@ export function OnrampCheckout() {
                   <button
                     type="submit"
                     disabled={isLoading || !email.trim()}
-                    className="w-full py-3.5 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <div className="text-white">{Icons.loader}</div>
@@ -442,17 +440,17 @@ export function OnrampCheckout() {
 
             {/* OTP Step */}
             {step === 'otp' && (
-              <div className="p-6">
+              <div className="p-5">
                 <button
                   onClick={() => goToStep('email', 'right')}
-                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5 transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
                 >
                   {Icons.arrowLeft}
                   <span>Back</span>
                 </button>
 
-                <div className="text-center mb-6">
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+                <div className="text-center mb-5">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-600">
                     {Icons.shield}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Verify your email</h2>
@@ -475,11 +473,10 @@ export function OnrampCheckout() {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className={`w-14 h-14 text-center text-xl font-semibold border rounded-xl transition-colors focus:outline-none ${
-                          digit 
-                            ? 'border-gray-900 bg-gray-50' 
+                        className={`w-14 h-14 text-center text-xl font-semibold border rounded-xl transition-colors focus:outline-none ${digit
+                            ? 'border-gray-900 bg-gray-50'
                             : 'border-gray-200 focus:border-gray-900'
-                        }`}
+                          }`}
                         autoFocus={index === 0}
                       />
                     ))}
@@ -521,9 +518,9 @@ export function OnrampCheckout() {
 
             {/* Bank Details Step */}
             {step === 'bank-details' && bankOrder && (
-              <div className="p-6">
-                <div className="text-center mb-5">
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-600">
+              <div className="p-5">
+                <div className="text-center mb-4">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-600">
                     {Icons.bank}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Complete transfer</h2>
@@ -538,7 +535,7 @@ export function OnrampCheckout() {
                     <span className="text-gray-500">Bank</span>
                     <span className="font-medium text-gray-900">{bankOrder.bank_name}</span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Account Name</span>
                     <span className="font-medium text-gray-900 text-right max-w-[180px] truncate">
@@ -603,9 +600,9 @@ export function OnrampCheckout() {
 
             {/* Under Review Step */}
             {step === 'under-review' && (
-              <div className="p-6">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500">
+              <div className="p-5">
+                <div className="text-center mb-5">
+                  <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-3 text-amber-500">
                     {Icons.clock}
                   </div>
                   <h2 className="text-lg font-semibold text-gray-900 mb-2">Payment Under Review</h2>
@@ -655,7 +652,7 @@ export function OnrampCheckout() {
                   <p className="text-sm text-gray-600 mb-3">
                     Contact our support team if you have questions:
                   </p>
-                  <a 
+                  <a
                     href={`mailto:dispute@zendfi.tech?subject=Payment Review - ${bankOrder?.payment_id || ''}&body=Order ID: ${bankOrder?.payment_id || ''}%0AEmail: ${email}`}
                     className="block w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors text-center"
                   >
@@ -676,7 +673,7 @@ export function OnrampCheckout() {
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-1">Payment Successful</h2>
                 <p className="text-sm text-gray-500">Thank you for your payment</p>
-                
+
                 <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                   ₦{bankOrder?.fiat_amount.toLocaleString()} received
@@ -697,7 +694,7 @@ export function OnrampCheckout() {
           </a>
         </div>
       </div>
-      
+
       <div className="h-safe-bottom" />
     </div>
   );
