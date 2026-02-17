@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useCheckoutStore } from '@/lib/store';
 import { api } from '@/lib/api';
 
-type OnrampStep = 'email' | 'verifying' | 'bank-details' | 'under-review' | 'success';
+type OnrampStep = 'email' | 'bank-details' | 'under-review' | 'success';
 
 // Clean, professional SVG icons
 const Icons = {
@@ -86,10 +86,11 @@ export function OnrampCheckout() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pollStartTime, setPollStartTime] = useState<number | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [isVerifying, setIsVerifying] = useState(false);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const steps: OnrampStep[] = ['email', 'verifying', 'bank-details', 'under-review', 'success'];
+  const steps: OnrampStep[] = ['email', 'bank-details', 'under-review', 'success'];
 
   // Slide transition between steps
   const goToStep = (newStep: OnrampStep, direction?: 'left' | 'right') => {
@@ -107,18 +108,19 @@ export function OnrampCheckout() {
     }, 200);
   };
 
-  // Poll for OTP processing and order creation
-  useEffect(() => {
-    if (step !== 'verifying' || !sessionId || !checkoutData) return;
+  // Silent background polling for OTP processing and order creation
+  const startBackgroundVerification = useCallback(async (sessionId: string) => {
+    if (!checkoutData) return;
 
+    setIsVerifying(true);
     setPollStartTime(Date.now());
     setRetryCount(0);
 
     // Set timeout for 90 seconds
     pollTimeoutRef.current = setTimeout(() => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-      setError('Verification is taking longer than expected. Please contact support.');
-      goToStep('under-review');
+      setIsVerifying(false);
+      setError('Verification is taking longer than expected. Please try again or contact support.');
     }, 90 * 1000);
 
     // Poll every 3 seconds
@@ -126,7 +128,7 @@ export function OnrampCheckout() {
       try {
         setRetryCount(prev => prev + 1);
         
-        console.log(`[Onramp] Polling for order creation (attempt ${retryCount + 1})...`);
+        console.log(`[Onramp] Silent verification polling (attempt ${retryCount + 1})...`);
         
         const order = await api.onrampCreateOrder({
           customer_email: email,
@@ -143,7 +145,8 @@ export function OnrampCheckout() {
         console.log('[Onramp] Order created successfully!', order);
         if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
         if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-
+        
+        setIsVerifying(false);
         setBankOrder(order);
 
         if (order.payment_id && checkoutData) {
@@ -168,19 +171,23 @@ export function OnrampCheckout() {
         if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
         if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
         
-        setError(err.message || 'Failed to process verification');
+        setIsVerifying(false);
+        setError(err.message || 'Failed to process verification. Please try again.');
       }
     };
 
     // Start polling immediately
     pollOrder();
     pollIntervalRef.current = setInterval(pollOrder, 3000);
+  }, [checkoutData, email, amount, retryCount, setBankOrder]);
 
+  // Cleanup polling on unmount
+  useEffect(() => {
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
       if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
     };
-  }, [step, sessionId, checkoutData, email, amount, setBankOrder]);
+  }, []);
 
   // Poll for payment completion
   useEffect(() => {
@@ -237,6 +244,7 @@ export function OnrampCheckout() {
     setError(null);
 
     try {
+      // Initiate session
       const response = await api.onrampInitiate({
         customer_email: email,
         fiat_amount: amount,
@@ -245,10 +253,12 @@ export function OnrampCheckout() {
       });
       
       setSessionId(response.session_id);
-      goToStep('verifying');
+      
+      // Keep loading state and start silent background verification
+      // Stay on email screen with loading indicator
+      startBackgroundVerification(response.session_id);
     } catch (err) {
       setError((err as Error).message || 'Failed to initiate session');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -315,15 +325,18 @@ export function OnrampCheckout() {
 
         {/* Progress */}
         <div className="flex justify-center gap-1.5 mt-4">
-          {steps.map((s, i) => {
-            const stepIndex = steps.indexOf(step);
+          {/* Only show 2 steps in progress: email and bank-details */}
+          {['email', 'bank-details'].map((s, i) => {
+            const visibleSteps = ['email', 'bank-details'];
+            const currentIndex = visibleSteps.indexOf(step as 'email' | 'bank-details');
             const isActive = s === step;
-            const isPast = i < stepIndex;
+            const isPast = currentIndex !== -1 && i < currentIndex;
 
             return (
               <div
                 key={s}
-                className={`h-1 rounded-full transition-all duration-300 ${isActive
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  isActive
                     ? 'w-6 bg-gray-900'
                     : isPast
                       ? 'w-1.5 bg-gray-400'
@@ -350,7 +363,9 @@ export function OnrampCheckout() {
                     {Icons.mail}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Enter your email</h2>
-                  <p className="text-sm text-gray-500 mt-1">We'll verify and process your payment</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {isVerifying ? 'Processing your payment details...' : 'We\'ll show you payment details instantly'}
+                  </p>
                 </div>
 
                 <div className="space-y-4">
@@ -363,13 +378,15 @@ export function OnrampCheckout() {
                         setEmailError('');
                       }}
                       placeholder="you@example.com"
-                      className={`w-full px-4 py-3 text-base border rounded-xl focus:outline-none transition-colors ${emailError
+                      className={`w-full px-4 py-3 text-base border rounded-xl focus:outline-none transition-colors ${
+                        emailError
                           ? 'border-red-200 bg-red-50/50'
                           : 'border-gray-200 focus:border-gray-900 bg-white'
                         }`}
                       autoFocus
                       autoComplete="email"
                       inputMode="email"
+                      disabled={isLoading || isVerifying}
                     />
                     {emailError && (
                       <p className="text-xs text-red-500 mt-2">{emailError}</p>
@@ -382,13 +399,28 @@ export function OnrampCheckout() {
                     </div>
                   )}
 
+                  {isVerifying && (
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="text-blue-500">{Icons.loader}</div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-700">Preparing payment details</p>
+                          <p className="text-xs text-blue-600 mt-0.5">This takes just a few seconds...</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    disabled={isLoading || !email.trim()}
+                    disabled={isLoading || isVerifying || !email.trim()}
                     className="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
-                    {isLoading ? (
-                      <div className="text-white">{Icons.loader}</div>
+                    {(isLoading || isVerifying) ? (
+                      <>
+                        <div className="text-white">{Icons.loader}</div>
+                        <span>Processing...</span>
+                      </>
                     ) : (
                       <>
                         Continue
@@ -400,57 +432,7 @@ export function OnrampCheckout() {
               </form>
             )}
 
-            {/* Verifying Step (Automatic OTP Processing) */}
-            {step === 'verifying' && (
-              <div className="p-5">
-                <div className="text-center mb-5">
-                  <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600">
-                    {Icons.loader}
-                  </div>
-                  <h2 className="text-base font-semibold text-gray-900">Verifying your email</h2>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Please wait while we process your verification
-                  </p>
-                </div>
 
-                {/* Progress Info */}
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="text-blue-500 mt-0.5">{Icons.shield}</div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-blue-900 mb-1">Automatic verification in progress</p>
-                      <p className="text-xs text-blue-700">
-                        We're securely verifying your email with our payment partner. 
-                        This usually takes 10-30 seconds.
-                      </p>
-                      {retryCount > 0 && (
-                        <p className="text-xs text-blue-600 mt-2">
-                          Attempt {retryCount}...
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl mb-4">
-                    <p className="text-sm text-red-600 text-center">{error}</p>
-                  </div>
-                )}
-
-                {/* Cancel option */}
-                <button
-                  onClick={() => {
-                    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-                    if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
-                    goToStep('email', 'right');
-                  }}
-                  className="w-full text-sm text-gray-500 hover:text-gray-700 py-2 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
 
             {/* Bank Details Step */}
             {step === 'bank-details' && bankOrder && (
