@@ -126,6 +126,8 @@ export function OnrampCheckout() {
       try {
         setRetryCount(prev => prev + 1);
         
+        console.log(`[Onramp] Polling for order creation (attempt ${retryCount + 1})...`);
+        
         const order = await api.onrampCreateOrder({
           customer_email: email,
           session_id: sessionId,
@@ -138,6 +140,7 @@ export function OnrampCheckout() {
         });
 
         // Success! OTP was processed
+        console.log('[Onramp] Order created successfully!', order);
         if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
         if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
 
@@ -156,12 +159,12 @@ export function OnrampCheckout() {
       } catch (err: any) {
         // 202 means still waiting for OTP - keep polling
         if (err.status === 202) {
-          console.log('Still waiting for OTP verification...');
+          console.log(`[Onramp] Still waiting for OTP verification (attempt ${retryCount + 1})...`);
           return;
         }
 
         // Other errors
-        console.error('Error creating order:', err);
+        console.error('[Onramp] Error creating order:', err);
         if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
         if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
         

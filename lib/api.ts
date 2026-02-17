@@ -220,6 +220,13 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
     });
+    
+    // 202 means still processing OTP - throw error to continue polling
+    if (response.status === 202) {
+      const data = await response.json();
+      throw new ApiError(202, data.message || 'Still processing verification');
+    }
+    
     if (!response.ok) {
       const data = await response.json();
       throw new ApiError(response.status, data.error || 'Invalid verification code');
