@@ -364,7 +364,7 @@ export function OnrampCheckout() {
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Enter your email</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {isVerifying ? 'Processing your payment details...' : 'We\'ll show you payment details instantly'}
+                    {isVerifying ? 'Processing your payment details...' : 'Should be ready any second now'}
                   </p>
                 </div>
 
