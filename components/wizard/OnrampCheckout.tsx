@@ -458,7 +458,7 @@ export function OnrampCheckout() {
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Complete transfer</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    Send <span className="font-semibold text-gray-900">₦{bankOrder.fiat_amount.toLocaleString()}</span> to complete
+                    Send <span className="font-semibold text-gray-900">₦{(bankOrder.fiat_amount || 0).toLocaleString()}</span> to complete
                   </p>
                 </div>
 
@@ -466,13 +466,13 @@ export function OnrampCheckout() {
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3 mb-4">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Bank</span>
-                    <span className="font-medium text-gray-900">{bankOrder.bank_name}</span>
+                    <span className="font-medium text-gray-900">{bankOrder.bank_name || 'N/A'}</span>
                   </div>
 
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Account Name</span>
                     <span className="font-medium text-gray-900 text-right max-w-[180px] truncate">
-                      {bankOrder.bank_account_name}
+                      {bankOrder.bank_account_name || 'N/A'}
                     </span>
                   </div>
 
@@ -480,11 +480,11 @@ export function OnrampCheckout() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">Account Number</span>
                       <button
-                        onClick={() => handleCopy(bankOrder.bank_account_number, 'account')}
+                        onClick={() => handleCopy(bankOrder.bank_account_number || '', 'account')}
                         className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-gray-200 hover:border-gray-300 active:scale-[0.98] transition-all"
                       >
                         <span className="text-base font-mono font-semibold text-gray-900">
-                          {bankOrder.bank_account_number}
+                          {bankOrder.bank_account_number || 'N/A'}
                         </span>
                         <span className={copied === 'account' ? 'text-green-500' : 'text-gray-400'}>
                           {copied === 'account' ? Icons.check : Icons.copy}
@@ -497,11 +497,11 @@ export function OnrampCheckout() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">Amount</span>
                       <button
-                        onClick={() => handleCopy(bankOrder.fiat_amount.toString(), 'amount')}
+                        onClick={() => handleCopy((bankOrder.fiat_amount || 0).toString(), 'amount')}
                         className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-gray-200 hover:border-gray-300 active:scale-[0.98] transition-all"
                       >
                         <span className="text-base font-semibold text-gray-900">
-                          ₦{bankOrder.fiat_amount.toLocaleString()}
+                          ₦{(bankOrder.fiat_amount || 0).toLocaleString()}
                         </span>
                         <span className={copied === 'amount' ? 'text-green-500' : 'text-gray-400'}>
                           {copied === 'amount' ? Icons.check : Icons.copy}
@@ -609,7 +609,7 @@ export function OnrampCheckout() {
 
                 <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  ₦{bankOrder?.fiat_amount.toLocaleString()} received
+                  ₦{(bankOrder?.fiat_amount || 0).toLocaleString()} received
                 </div>
               </div>
             )}
