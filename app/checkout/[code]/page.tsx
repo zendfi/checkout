@@ -85,6 +85,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!checkoutData?.payment_id) return;
+    // Onramp checkouts use their own internal status flow — no Solana payment to poll.
+    if (checkoutData.onramp) return;
 
     const terminalStates = ['confirmed', 'failed', 'expired', 'cancelled'];
     if (paymentStatus && terminalStates.includes(paymentStatus.status)) {

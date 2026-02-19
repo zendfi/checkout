@@ -104,6 +104,7 @@ export interface OnrampInitiateResponse {
 
 export interface OnrampCreateOrderRequest {
   customer_email: string;
+  customer_name?: string;
   otp?: string; // Optional - for legacy flow
   session_id?: string; // Optional - for centralized flow
   fiat_amount: number;
