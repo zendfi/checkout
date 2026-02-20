@@ -23,6 +23,8 @@ export interface HostedCheckoutData {
   service_charge_ngn?: number;
   /** Whether service charge applies to this link */
   payer_service_charge?: boolean;
+  /** Whether checkout should show full customer details form before payment */
+  collect_customer_info?: boolean;
 }
 
 export interface PaymentLinkResponse {

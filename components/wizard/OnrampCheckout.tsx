@@ -89,6 +89,19 @@ export function OnrampCheckout() {
   const [isVerifying, setIsVerifying] = useState(false);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Extra customer info fields shown when collect_customer_info is true
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [company, setCompany] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [stateField, setStateField] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
+  const [showAddressFields, setShowAddressFields] = useState(false);
+  // Ref holds pending customer info to submit once we have a payment_id from the order
+  const pendingCustomerInfoRef = useRef<Record<string, unknown> | null>(null);
 
   const steps: OnrampStep[] = ['email', 'bank-details', 'under-review', 'success'];
 
@@ -157,6 +170,13 @@ export function OnrampCheckout() {
               payment_id: order.payment_id!
             } : null
           }));
+
+          // Submit collected customer info now that we have a payment_id
+          if (pendingCustomerInfoRef.current) {
+            api.submitCustomerInfo(order.payment_id, pendingCustomerInfoRef.current as any)
+              .catch(e => console.error('[Onramp] Failed to save customer info:', e));
+            pendingCustomerInfoRef.current = null;
+          }
         }
 
         goToStep('bank-details');
@@ -243,6 +263,25 @@ export function OnrampCheckout() {
 
     setIsLoading(true);
     setError(null);
+
+    // Stash customer info to be submitted once the payment_id is known
+    if (checkoutData?.collect_customer_info) {
+      const info: Record<string, unknown> = { email };
+      if (name.trim()) info.name = name.trim();
+      if (phone.trim()) info.phone = phone.trim();
+      if (company.trim()) info.company = company.trim();
+      if (addressLine1.trim()) {
+        info.billing_address = {
+          address_line1: addressLine1.trim(),
+          address_line2: addressLine2.trim() || null,
+          city: city.trim() || '',
+          state: stateField.trim() || null,
+          postal_code: postalCode.trim() || '',
+          country: country.trim().toUpperCase() || 'NG',
+        };
+      }
+      pendingCustomerInfoRef.current = info;
+    }
 
     try {
       // Initiate session
@@ -374,13 +413,33 @@ export function OnrampCheckout() {
                   <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-600">
                     {Icons.mail}
                   </div>
-                  <h2 className="text-base font-semibold text-gray-900">Enter your email</h2>
+                  <h2 className="text-base font-semibold text-gray-900">
+                    {checkoutData.collect_customer_info ? 'Your details' : 'Enter your email'}
+                  </h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {isVerifying ? 'Processing your payment details...' : 'Should be ready any second now'}
+                    {isVerifying ? 'Processing your payment details...' : (
+                      checkoutData.collect_customer_info
+                        ? 'We need a few details to complete your payment'
+                        : 'Should be ready any second now'
+                    )}
                   </p>
                 </div>
 
                 <div className="space-y-4">
+                  {/* Name — shown when collect_customer_info */}
+                  {checkoutData.collect_customer_info && (
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Full name (optional)"
+                      className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white"
+                      autoComplete="name"
+                      disabled={isLoading || isVerifying}
+                    />
+                  )}
+
+                  {/* Email */}
                   <div>
                     <input
                       type="email"
@@ -389,13 +448,13 @@ export function OnrampCheckout() {
                         setEmail(e.target.value);
                         setEmailError('');
                       }}
-                      placeholder="you@example.com"
+                      placeholder="Email address"
                       className={`w-full px-4 py-3 text-base border rounded-xl focus:outline-none transition-colors ${
                         emailError
                           ? 'border-red-200 bg-red-50/50'
                           : 'border-gray-200 focus:border-gray-900 bg-white'
                         }`}
-                      autoFocus
+                      autoFocus={!checkoutData.collect_customer_info}
                       autoComplete="email"
                       inputMode="email"
                       disabled={isLoading || isVerifying}
@@ -404,6 +463,61 @@ export function OnrampCheckout() {
                       <p className="text-xs text-red-500 mt-2">{emailError}</p>
                     )}
                   </div>
+
+                  {/* Extra fields — only when collect_customer_info */}
+                  {checkoutData.collect_customer_info && (
+                    <>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Phone number (optional)"
+                        className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white"
+                        autoComplete="tel"
+                        disabled={isLoading || isVerifying}
+                      />
+                      <input
+                        type="text"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        placeholder="Company (optional)"
+                        className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white"
+                        autoComplete="organization"
+                        disabled={isLoading || isVerifying}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAddressFields(!showAddressFields)}
+                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                        disabled={isLoading || isVerifying}
+                      >
+                        <span className={`w-4 h-4 border-2 rounded flex items-center justify-center flex-shrink-0 transition-colors ${
+                          showAddressFields ? 'border-gray-900 bg-gray-900' : 'border-gray-300'
+                        }`}>
+                          {showAddressFields && (
+                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                          )}
+                        </span>
+                        Add billing address (optional)
+                      </button>
+                      {showAddressFields && (
+                        <div className="space-y-2.5">
+                          <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="Street address" autoComplete="address-line1" disabled={isLoading || isVerifying} className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white" />
+                          <input type="text" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} placeholder="Apt, suite, etc. (optional)" autoComplete="address-line2" disabled={isLoading || isVerifying} className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white" />
+                          <div className="flex gap-2">
+                            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" autoComplete="address-level2" disabled={isLoading || isVerifying} className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white" />
+                            <input type="text" value={stateField} onChange={(e) => setStateField(e.target.value)} placeholder="State" autoComplete="address-level1" disabled={isLoading || isVerifying} className="w-24 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white" />
+                          </div>
+                          <div className="flex gap-2">
+                            <input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal code" autoComplete="postal-code" disabled={isLoading || isVerifying} className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white" />
+                            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Country (e.g. NG)" autoComplete="country" maxLength={2} disabled={isLoading || isVerifying} className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors bg-white" />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
 
                   {error && (
                     <div className="p-3 bg-red-50 border border-red-100 rounded-xl">

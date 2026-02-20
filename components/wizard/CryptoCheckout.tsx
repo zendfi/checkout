@@ -116,6 +116,16 @@ export function CryptoCheckout() {
   const [name, setName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // Extra customer fields shown when collect_customer_info flag is true
+  const [phone, setPhone] = useState('');
+  const [company, setCompany] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [stateField, setStateField] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
+  const [showAddressFields, setShowAddressFields] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [availableWallets, setAvailableWallets] = useState<DetectedWallet[]>([]);
   const [processingMessage, setProcessingMessage] = useState('');
@@ -170,10 +180,21 @@ export function CryptoCheckout() {
     setIsLoading(true);
 
     try {
-      const customerData: { email: string; name?: string } = { email };
+      const customerData: Record<string, unknown> = { email };
       if (name.trim()) customerData.name = name.trim();
-
-      await api.submitCustomerInfo(checkoutData.payment_id, customerData);
+      if (phone.trim()) customerData.phone = phone.trim();
+      if (company.trim()) customerData.company = company.trim();
+      if (addressLine1.trim()) {
+        customerData.billing_address = {
+          address_line1: addressLine1.trim(),
+          address_line2: addressLine2.trim() || null,
+          city: city.trim() || '',
+          state: stateField.trim() || null,
+          postal_code: postalCode.trim() || '',
+          country: country.trim().toUpperCase() || 'US',
+        };
+      }
+      await api.submitCustomerInfo(checkoutData.payment_id, customerData as any);
       goToStep('method');
     } catch (err) {
       setEmailError('Failed to save. Please try again.');
@@ -385,7 +406,11 @@ export function CryptoCheckout() {
                     {Icons.user}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">Your details</h2>
-                  <p className="text-sm text-gray-500 mt-1">We'll send a receipt to your email</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {checkoutData.collect_customer_info
+                      ? 'Please fill in your details to continue'
+                      : "We'll send a receipt to your email"}
+                  </p>
                 </div>
 
                 <div className="space-y-3">
@@ -398,7 +423,7 @@ export function CryptoCheckout() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Full name (optional)"
+                      placeholder={checkoutData.collect_customer_info ? 'Full name' : 'Full name (optional)'}
                       className="w-full pl-11 pr-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors"
                     />
                   </div>
@@ -427,6 +452,58 @@ export function CryptoCheckout() {
                       <p className="text-xs text-red-500 mt-2">{emailError}</p>
                     )}
                   </div>
+
+                  {/* Extra fields — only when collect_customer_info is enabled */}
+                  {checkoutData.collect_customer_info && (
+                    <>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Phone number (optional)"
+                        className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors"
+                        autoComplete="tel"
+                      />
+                      <input
+                        type="text"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        placeholder="Company (optional)"
+                        className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors"
+                        autoComplete="organization"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAddressFields(!showAddressFields)}
+                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                      >
+                        <span className={`w-4 h-4 border-2 rounded flex items-center justify-center flex-shrink-0 transition-colors ${
+                          showAddressFields ? 'border-gray-900 bg-gray-900' : 'border-gray-300'
+                        }`}>
+                          {showAddressFields && (
+                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                          )}
+                        </span>
+                        Add billing address
+                      </button>
+                      {showAddressFields && (
+                        <div className="space-y-2.5">
+                          <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="Street address" autoComplete="address-line1" className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                          <input type="text" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} placeholder="Apt, suite, etc. (optional)" autoComplete="address-line2" className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                          <div className="flex gap-2">
+                            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" autoComplete="address-level2" className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                            <input type="text" value={stateField} onChange={(e) => setStateField(e.target.value)} placeholder="State" autoComplete="address-level1" className="w-24 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                          </div>
+                          <div className="flex gap-2">
+                            <input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal code" autoComplete="postal-code" className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Country (e.g. US)" autoComplete="country" maxLength={2} className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
 
                   <button
                     type="submit"
