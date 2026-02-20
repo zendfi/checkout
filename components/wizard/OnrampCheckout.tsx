@@ -139,6 +139,7 @@ export function OnrampCheckout() {
           payment_intent_id: null,
           webhook_url: null,
           amount_ngn: checkoutData.amount_ngn,
+          payer_service_charge: checkoutData.payer_service_charge,
         });
 
         // Success! OTP was processed
@@ -270,7 +271,11 @@ export function OnrampCheckout() {
     setTimeout(() => setCopied(null), 2000);
   }, []);
 
-  const ngnAmount = checkoutData?.amount_ngn || Math.round(amount * 1500);
+  const serviceChargeNgn = (checkoutData?.payer_service_charge && checkoutData?.service_charge_ngn)
+    ? checkoutData.service_charge_ngn
+    : 0;
+  const baseNgnAmount = checkoutData?.amount_ngn || Math.round(amount * 1500);
+  const ngnAmount = baseNgnAmount + serviceChargeNgn;
 
   if (!checkoutData) {
     return (
@@ -316,6 +321,13 @@ export function OnrampCheckout() {
           <div className="text-3xl sm:text-4xl font-semibold text-gray-900 tracking-tight">
             ₦{ngnAmount.toLocaleString()}
           </div>
+          {serviceChargeNgn > 0 && (
+            <div className="flex items-center justify-center gap-1.5 mt-1.5">
+              <span className="text-xs text-gray-400">
+                ₦{baseNgnAmount.toLocaleString()} + ₦{serviceChargeNgn.toLocaleString()} service fee
+              </span>
+            </div>
+          )}
           {checkoutData.description && (
             <p className="text-sm text-gray-500 mt-2 max-w-[280px] mx-auto truncate">
               {checkoutData.description}

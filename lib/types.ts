@@ -19,6 +19,10 @@ export interface HostedCheckoutData {
   payment_link_id: string | null;
   /** Original NGN amount for exact PAJ conversion (if set via NGN calculator) */
   amount_ngn?: number;
+  /** Service charge in NGN added on top of amount_ngn (shown to payer, inflated into PAJ) */
+  service_charge_ngn?: number;
+  /** Whether service charge applies to this link */
+  payer_service_charge?: boolean;
 }
 
 export interface PaymentLinkResponse {
@@ -113,8 +117,8 @@ export interface OnrampCreateOrderRequest {
   payment_intent_id: string | null;
   webhook_url: string | null;
   /** Original NGN amount for exact PAJ conversion */
-  amount_ngn?: number;
-}
+  amount_ngn?: number;  /** Whether service charge should be applied/was applied */
+  payer_service_charge?: boolean;}
 
 export interface OnrampOrderResponse {
   order_id: string;
