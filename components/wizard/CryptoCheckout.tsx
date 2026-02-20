@@ -492,13 +492,13 @@ export function CryptoCheckout() {
                         <div className="space-y-2.5">
                           <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="Street address" autoComplete="address-line1" className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
                           <input type="text" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} placeholder="Apt, suite, etc. (optional)" autoComplete="address-line2" className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
-                          <div className="flex gap-2">
-                            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" autoComplete="address-level2" className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
-                            <input type="text" value={stateField} onChange={(e) => setStateField(e.target.value)} placeholder="State" autoComplete="address-level1" className="w-24 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" autoComplete="address-level2" className="w-full px-3 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                            <input type="text" value={stateField} onChange={(e) => setStateField(e.target.value)} placeholder="State" autoComplete="address-level1" className="w-full px-3 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
                           </div>
-                          <div className="flex gap-2">
-                            <input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal code" autoComplete="postal-code" className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
-                            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Country (e.g. US)" autoComplete="country" maxLength={2} className="flex-1 px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="Postal code" autoComplete="postal-code" className="w-full px-3 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
+                            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Country (e.g. US)" autoComplete="country" maxLength={2} className="w-full px-3 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors" />
                           </div>
                         </div>
                       )}
