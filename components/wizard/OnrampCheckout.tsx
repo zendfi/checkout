@@ -420,7 +420,7 @@ export function OnrampCheckout() {
                     {isVerifying ? 'Processing your payment details...' : (
                       checkoutData.collect_customer_info
                         ? 'We need a few details to complete your payment'
-                        : 'Should be ready any second now'
+                        : 'We would send your recipet here '
                     )}
                   </p>
                 </div>
