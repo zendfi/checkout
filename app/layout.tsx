@@ -2,10 +2,14 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ZendFi Checkout',
+  title: 'ZendFi Checkout | Secure Crypto Payments',
   description: 'Secure crypto payment powered by Solana',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon.ico', sizes: '16x16' },
+    ],
+    apple: '/favicon.ico',
   },
 };
 
