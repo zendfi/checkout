@@ -33,9 +33,33 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: #F8FAFC;
   min-height: 100vh;
+  min-height: 100dvh;
   color: #111827;
   font-size: 14px;
   line-height: 1.5;
+  overscroll-behavior-y: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ===== Touch Optimizations ===== */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Prevent iOS input zoom (ensure all inputs are font-size >= 16px) */
+input,
+select,
+textarea {
+  font-size: 16px;
 }
 
 /* ===== Animations ===== */

@@ -334,11 +334,11 @@ export function CryptoCheckout() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#FAFBFC]">
+    <div className="w-full min-h-[100dvh] bg-[#FAFBFC]">
       <div className="h-safe-top" />
 
       {/* Header */}
-      <div className="flex-shrink-0 pt-6 sm:pt-8 pb-4 px-5">
+      <div className="flex-shrink-0 pt-5 sm:pt-8 pb-3 sm:pb-4 px-4 sm:px-5">
         {/* Merchant */}
         <div className="flex justify-center mb-3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-gray-100">
@@ -392,11 +392,11 @@ export function CryptoCheckout() {
       </div>
 
       {/* Content */}
-      <div className="flex items-start justify-center px-5 py-4">
+      <div className="flex justify-center px-0 sm:px-5 pt-0 sm:pt-2 pb-4">
         <div
-          className={`w-full max-w-[400px] transition-all duration-200 ease-out ${getSlideClasses()}`}
+          className={`w-full max-w-[400px] mx-auto transition-all duration-200 ease-out ${getSlideClasses()}`}
         >
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-none sm:rounded-2xl border-0 sm:border border-gray-100 overflow-hidden">
 
             {/* Info Step */}
             {step === 'info' && (
@@ -445,6 +445,7 @@ export function CryptoCheckout() {
                         className={`w-full pl-11 pr-4 py-3 text-base border rounded-xl focus:outline-none transition-colors ${emailError ? 'border-red-200 bg-red-50/50' : 'border-gray-200 focus:border-gray-900'
                           }`}
                         autoComplete="email"
+                        inputMode="email"
                         required
                       />
                     </div>
@@ -463,6 +464,7 @@ export function CryptoCheckout() {
                         placeholder="Phone number (optional)"
                         className="w-full px-4 py-3 text-base border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 transition-colors"
                         autoComplete="tel"
+                        inputMode="tel"
                       />
                       <input
                         type="text"
@@ -718,7 +720,7 @@ export function CryptoCheckout() {
 
             {/* Success Step */}
             {step === 'success' && (
-              <div className="p-8 text-center">
+              <div className="p-6 sm:p-8 text-center">
                 <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 text-green-500">
                   {Icons.checkCircle}
                 </div>
@@ -736,7 +738,7 @@ export function CryptoCheckout() {
       </div>
 
       {/* Footer */}
-      <div className="mt-6 pb-3 px-5">
+      <div className="mt-4 pb-4 px-4 sm:px-5">
         <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
           {Icons.lock}
           <span>Secured by</span>
