@@ -25,6 +25,8 @@ export interface HostedCheckoutData {
   payer_service_charge?: boolean;
   /** Whether checkout should show full customer details form before payment */
   collect_customer_info?: boolean;
+  /** Pre-filled customer data for bypassing info collection */
+  customer_data?: CustomerInfo;
 }
 
 export interface PaymentLinkResponse {

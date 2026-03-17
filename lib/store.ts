@@ -78,8 +78,21 @@ interface CheckoutState {
 
 export const useCheckoutStore = create<CheckoutState>((set) => ({
   checkoutData: null,
-  setCheckoutData: (data) => set({ checkoutData: data, amount: data?.amount_usd || 0 }),
-  
+  setCheckoutData: (data) => set((state) => {
+    let email = state.customerEmail;
+    let name = state.customerName;
+    if (data?.customer_data) {
+      email = data.customer_data.email || state.customerEmail;
+      name = data.customer_data.name || state.customerName;
+    }
+    return {
+      checkoutData: data,
+      amount: data?.amount_usd || 0,
+      customerEmail: email,
+      customerName: name,
+    };
+  }),
+
   amount: 0,
   setAmount: (amount) => set({ amount }),
   

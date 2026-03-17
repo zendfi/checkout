@@ -109,11 +109,12 @@ export function CryptoCheckout() {
     setWalletSelectorOpen,
   } = useCheckoutStore();
 
-  const [step, setStep] = useState<CryptoStep>('info');
+  const initialStep: CryptoStep = checkoutData?.customer_data ? 'method' : 'info';
+  const [step, setStep] = useState<CryptoStep>(initialStep);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState(checkoutData?.customer_data?.email || '');
+  const [name, setName] = useState(checkoutData?.customer_data?.name || '');
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   // Extra customer fields shown when collect_customer_info flag is true

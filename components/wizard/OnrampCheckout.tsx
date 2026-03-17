@@ -74,10 +74,14 @@ const Icons = {
 export function OnrampCheckout() {
   const { checkoutData, amount, setBankOrder, bankOrder, setSuccessModalOpen } = useCheckoutStore();
 
-  const [step, setStep] = useState<OnrampStep>('email');
-  const [prevStep, setPrevStep] = useState<OnrampStep>('email');
+  const initialStep: OnrampStep = checkoutData?.customer_data ? 'bank-details' : 'email';
+  const [step, setStep] = useState<OnrampStep>(initialStep);
+  const [prevStep, setPrevStep] = useState<OnrampStep>(initialStep);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
-  const [email, setEmail] = useState('');
+  
+  // Initialize customer data from checkoutData if provided
+  const [email, setEmail] = useState(checkoutData?.customer_data?.email || '');
+  const [name, setName] = useState(checkoutData?.customer_data?.name || '');
   const [emailError, setEmailError] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +94,6 @@ export function OnrampCheckout() {
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   // Extra customer info fields shown when collect_customer_info is true
-  const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
   const [addressLine1, setAddressLine1] = useState('');

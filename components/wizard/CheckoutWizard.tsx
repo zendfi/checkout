@@ -21,7 +21,7 @@ interface CheckoutWizardProps {
 
 export function CheckoutWizard({ merchantName, network, expiresAt }: CheckoutWizardProps) {
   const { checkoutData, paymentStatus, customerName, customerEmail } = useCheckoutStore();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(checkoutData?.customer_data ? 2 : 1);
 
   const handleStep1Complete = () => {
     setCurrentStep(2);
