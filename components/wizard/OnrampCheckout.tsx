@@ -74,9 +74,8 @@ const Icons = {
 export function OnrampCheckout() {
   const { checkoutData, amount, setBankOrder, bankOrder, setSuccessModalOpen } = useCheckoutStore();
 
-  const initialStep: OnrampStep = checkoutData?.customer_data ? 'bank-details' : 'email';
-  const [step, setStep] = useState<OnrampStep>(initialStep);
-  const [prevStep, setPrevStep] = useState<OnrampStep>(initialStep);
+  const [step, setStep] = useState<OnrampStep>('email');
+  const [prevStep, setPrevStep] = useState<OnrampStep>('email');
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   
   // Initialize customer data from checkoutData if provided
@@ -417,11 +416,13 @@ export function OnrampCheckout() {
                     {Icons.mail}
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">
-                    {checkoutData.collect_customer_info ? 'Your details' : 'Enter your email'}
+                    {checkoutData.customer_data ? 'Ready to Pay' : checkoutData.collect_customer_info ? 'Your details' : 'Enter your email'}
                   </h2>
                   <p className="text-sm text-gray-500 mt-1">
                     {isVerifying ? 'Processing your payment details...' : (
-                      checkoutData.collect_customer_info
+                      checkoutData.customer_data
+                        ? `Continue as ${checkoutData.customer_data.email}`
+                        : checkoutData.collect_customer_info
                         ? 'We need a few details to complete your payment'
                         : 'We would send your recipet here '
                     )}
@@ -429,7 +430,9 @@ export function OnrampCheckout() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* Name — shown when collect_customer_info */}
+                  {!checkoutData.customer_data && (
+                    <>
+                      {/* Name — shown when collect_customer_info */}
                   {checkoutData.collect_customer_info && (
                     <input
                       type="text"
@@ -519,6 +522,8 @@ export function OnrampCheckout() {
                       )}
                     </>
                   )}
+                  </>
+                  )}
 
                   {error && (
                     <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
@@ -540,7 +545,7 @@ export function OnrampCheckout() {
 
                   <button
                     type="submit"
-                    disabled={isLoading || isVerifying || !email.trim()}
+                    disabled={isLoading || isVerifying || (!checkoutData.customer_data && !email.trim())}
                     className="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-base font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     {(isLoading || isVerifying) ? (
@@ -550,7 +555,7 @@ export function OnrampCheckout() {
                       </>
                     ) : (
                       <>
-                        Continue
+                        {checkoutData.customer_data ? 'Continue to Pay' : 'Continue'}
                         {Icons.arrowRight}
                       </>
                     )}
