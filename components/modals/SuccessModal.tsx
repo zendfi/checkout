@@ -18,6 +18,12 @@ export function SuccessModal() {
     ? `https://solscan.io/tx/${paymentStatus.transaction_signature}${checkoutData?.solana_network === 'devnet' ? '?cluster=devnet' : ''}`
     : null;
 
+  const disputeUrl = checkoutData?.payment_id
+    ? `https://zendfi.tech/disputes?payment_id=${checkoutData.payment_id}`
+    : 'https://zendfi.tech/disputes';
+
+  const disputeStatusUrl = 'https://zendfi.tech/disputes/status';
+
   return (
     <div className="modal-overlay" onClick={handleBackdropClick}>
       <div className="modal-content max-w-[440px]">
@@ -57,7 +63,27 @@ export function SuccessModal() {
         </div>
 
         {/* Action */}
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 space-y-3">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+            Need help with this payment?
+            <a
+              href={disputeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 font-semibold text-primary-DEFAULT hover:text-primary-700"
+            >
+              Open a dispute
+            </a>
+            <span className="mx-1">•</span>
+            <a
+              href={disputeStatusUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary-DEFAULT hover:text-primary-700"
+            >
+              Check dispute status
+            </a>
+          </div>
           <button
             className="btn btn-primary w-full"
             onClick={() => setSuccessModalOpen(false)}
