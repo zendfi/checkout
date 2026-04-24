@@ -1,28 +1,49 @@
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="card max-w-md w-full p-8 text-center">
-        <div className="mb-6">
-          <svg
-            className="w-16 h-16 mx-auto text-brand-purple"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="2" />
-            <path strokeWidth="2" d="M16 10h.01" />
-          </svg>
+    <main className="min-h-screen bg-white px-6 py-16">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
+        <div className="inline-flex w-fit items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+          zdfi.me
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">ZendFi Checkout</h1>
-        <p className="text-gray-500 mb-6">
-          Secure crypto payments powered by Solana
-        </p>
-        <div className="info-box">
-          <p>
-            To make a payment, open your merchant&apos;s canonical zdfi.me link (for example zdfi.me/username or zdfi.me/username/request_id).
+
+        <div className="max-w-2xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-6xl">
+            Get paid globally.
+            <br />
+            <span className="text-primary">From one smart link.</span>
+          </h1>
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-gray-500">
+            ZendFi helps people get paid worldwide with a single link. It can detect where the payer is, then show the right local payment details for that country.
           </p>
         </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-gray-200 p-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">Your main link</div>
+            <div className="mt-2 text-sm text-gray-700">zdfi.me/username</div>
+            <p className="mt-2 text-sm text-gray-500">Use this when you want a simple pay-me-any-amount page.</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 p-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">A fixed request</div>
+            <div className="mt-2 text-sm text-gray-700">zdfi.me/username/request_id</div>
+            <p className="mt-2 text-sm text-gray-500">Use this when the amount is already set and you want the payer to see the right local payment details.</p>
+          </div>
+        </div>
+
+        <div className="max-w-2xl rounded-xl border border-gray-200 p-4">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">Example</div>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            A merchant creates one link in Nigeria. A payer in the US sees US payment details, a payer in Mexico sees Mexican payment details, and a payer in the UK sees faster payment details, all from the same link.
+          </p>
+        </div>
+
+        <a
+          href="https://dashboard.zendfi.tech/setup"
+          className="w-fit rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:brightness-110"
+        >
+          Sounds cool, right? Get your own link to get paid globally today
+        </a>
       </div>
-    </div>
+    </main>
   );
 }
