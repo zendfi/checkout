@@ -19,7 +19,7 @@ export default function Home() {
         </p>
         <div className="info-box">
           <p>
-            To make a payment, you need a valid payment link from a merchant.
+            To make a payment, open your merchant&apos;s canonical zdfi.me link (for example zdfi.me/username or zdfi.me/username/request_id).
           </p>
         </div>
       </div>
