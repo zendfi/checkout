@@ -27,6 +27,55 @@ export interface HostedCheckoutData {
   collect_customer_info?: boolean;
   /** Pre-filled customer data for bypassing info collection */
   customer_data?: CustomerInfo;
+  local_payment_option?: {
+    country_code: string;
+    provider: string;
+    rail: string;
+    local_currency: string;
+    local_amount: number;
+    fx_rate: number;
+    quote_source: string;
+    quote_generated_at: string;
+    payment_details?: Record<string, unknown> | null;
+  };
+}
+
+export interface PublicMerchantLinkData {
+  link_kind: 'general';
+  merchant: {
+    id: string;
+    name: string;
+    merchant_user_name: string;
+  };
+  routing: {
+    country_code: string;
+    provider: string;
+    rail: string;
+  };
+  payment_details?: Record<string, unknown> | null;
+  public_link_url: string;
+  request_link_template: string;
+}
+
+export interface PublicRequestLinkData {
+  link_kind: string;
+  merchant: {
+    merchant_user_name: string;
+    name: string;
+  };
+  request: {
+    id: string;
+    request_link_id: string;
+    link_code: string;
+    amount_usd: number;
+    currency: string;
+    token: string;
+    description?: string | null;
+    expires_at?: string | null;
+  };
+  local_payment_option?: HostedCheckoutData['local_payment_option'];
+  strict_request_only: boolean;
+  request_link_url: string;
 }
 
 export interface PaymentLinkResponse {

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useCheckoutStore } from '@/lib/store';
 import { CryptoCheckout } from '@/components/wizard/CryptoCheckout';
+import { GeoPaymentNotice } from '@/components/GeoPaymentNotice';
 import { ErrorModal } from '@/components/modals/ErrorModal';
 import { SuccessModal } from '@/components/modals/SuccessModal';
 import { WalletSelectorModal } from '@/components/modals/WalletSelectorModal';
@@ -13,7 +14,7 @@ export default function PayPage() {
   const params = useParams();
   const paymentId = params.id as string;
   
-  const { setCheckoutData } = useCheckoutStore();
+  const { checkoutData, setCheckoutData } = useCheckoutStore();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +75,9 @@ export default function PayPage() {
 
   return (
     <>
+      <div className="mx-auto w-full max-w-5xl px-4 pt-4 sm:pt-6">
+        <GeoPaymentNotice checkoutData={checkoutData} />
+      </div>
       <CryptoCheckout />
       
       {/* Modals - controlled by Zustand store */}

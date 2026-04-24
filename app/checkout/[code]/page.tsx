@@ -6,6 +6,7 @@ import { api, ApiError } from '@/lib/api';
 import { useCheckoutStore } from '@/lib/store';
 import { OnrampCheckout } from '@/components/wizard/OnrampCheckout';
 import { CryptoCheckout } from '@/components/wizard/CryptoCheckout';
+import { GeoPaymentNotice } from '@/components/GeoPaymentNotice';
 import { ErrorModal } from '@/components/modals/ErrorModal';
 import { SuccessModal } from '@/components/modals/SuccessModal';
 import { CopySuccessModal } from '@/components/modals/CopySuccessModal';
@@ -151,6 +152,9 @@ export default function CheckoutPage() {
   if (checkoutData.onramp) {
     return (
       <>
+        <div className="mx-auto w-full max-w-5xl px-4 pt-4 sm:pt-6">
+          <GeoPaymentNotice checkoutData={checkoutData} />
+        </div>
         <OnrampCheckout />
         <ErrorModal />
         <SuccessModal />
@@ -162,6 +166,9 @@ export default function CheckoutPage() {
   // Clean crypto checkout flow
   return (
     <>
+      <div className="mx-auto w-full max-w-5xl px-4 pt-4 sm:pt-6">
+        <GeoPaymentNotice checkoutData={checkoutData} />
+      </div>
       <CryptoCheckout />
       <ErrorModal />
       <SuccessModal />

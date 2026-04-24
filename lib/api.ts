@@ -1,5 +1,7 @@
 import {
   HostedCheckoutData,
+  PublicMerchantLinkData,
+  PublicRequestLinkData,
   BuildTransactionRequest,
   BuildTransactionResponse,
   CheckBalanceRequest,
@@ -76,6 +78,73 @@ async function fetchWithRetry<T>(
 }
 
 export const api = {
+  // Public merchant PWYW page data
+  async getPublicMerchantLink(merchantUserName: string): Promise<PublicMerchantLinkData> {
+    const response = await fetch(`${API_BASE}/api/v1/public/links/${merchantUserName}`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'Merchant link not found');
+      }
+      throw new ApiError(response.status, 'Failed to fetch merchant link data');
+    }
+    return response.json();
+  },
+
+  // Public merchant PWYW payment creation
+  async createPublicMerchantPayment(
+    merchantUserName: string,
+    amountUsd: number
+  ): Promise<HostedCheckoutData> {
+    const response = await fetch(`${API_BASE}/api/v1/public/links/${merchantUserName}/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount_usd: amountUsd }),
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'Merchant link not found');
+      }
+      throw new ApiError(response.status, 'Failed to create merchant payment');
+    }
+    return response.json();
+  },
+
+  // Public request-link data
+  async getPublicRequestLink(
+    merchantUserName: string,
+    requestLinkId: string
+  ): Promise<PublicRequestLinkData> {
+    const response = await fetch(`${API_BASE}/api/v1/public/links/${merchantUserName}/${requestLinkId}`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'Request link not found');
+      }
+      throw new ApiError(response.status, 'Failed to fetch request link data');
+    }
+    return response.json();
+  },
+
+  // Public request-link payment creation (fixed amount)
+  async createPublicRequestPayment(
+    merchantUserName: string,
+    requestLinkId: string
+  ): Promise<HostedCheckoutData> {
+    const response = await fetch(`${API_BASE}/api/v1/public/links/${merchantUserName}/${requestLinkId}/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'Request link not found');
+      }
+      if (response.status === 410) {
+        throw new ApiError(410, 'Request link expired or maxed out');
+      }
+      throw new ApiError(response.status, 'Failed to create request payment');
+    }
+    return response.json();
+  },
+
   // Get payment link info
   async getPaymentLink(linkCode: string): Promise<HostedCheckoutData> {
     const response = await fetch(`${API_BASE}/api/v1/checkout/${linkCode}`);
