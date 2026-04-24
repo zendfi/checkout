@@ -1,6 +1,23 @@
 export default function Home() {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'zdfi.me',
+    url: 'https://zdfi.me',
+    description: 'Global payment links that localize payer instructions by country.',
+    publisher: {
+      '@type': 'Organization',
+      name: 'ZendFi',
+      url: 'https://zendfi.tech',
+    },
+  };
+
   return (
     <main className="min-h-screen bg-white px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
         <div className="inline-flex w-fit items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
           zdfi.me

@@ -2,6 +2,9 @@ import {
   HostedCheckoutData,
   PublicMerchantLinkData,
   PublicRequestLinkData,
+  PublicRequestTransferPrepareResponse,
+  PrepareLocalOptionRequest,
+  PaymentLocalOptionPrepareResponse,
   BuildTransactionRequest,
   BuildTransactionResponse,
   CheckBalanceRequest,
@@ -14,7 +17,7 @@ import {
   OnrampOrderResponse,
 } from './types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.zendfi.tech';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -141,6 +144,50 @@ export const api = {
         throw new ApiError(410, 'Request link expired or maxed out');
       }
       throw new ApiError(response.status, 'Failed to create request payment');
+    }
+    return response.json();
+  },
+
+  // Public request-link transfer preparation (geo/provider instruction hydration)
+  async preparePublicRequestLinkTransfer(
+    merchantUserName: string,
+    requestLinkId: string,
+    data: PrepareLocalOptionRequest = {}
+  ): Promise<PublicRequestTransferPrepareResponse> {
+    const response = await fetch(
+      `${API_BASE}/api/v1/public/links/${merchantUserName}/${requestLinkId}/prepare-transfer`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }
+    );
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'Request link not found');
+      }
+      if (response.status === 410) {
+        throw new ApiError(410, 'Request link expired or maxed out');
+      }
+      throw new ApiError(response.status, 'Failed to prepare request transfer');
+    }
+    return response.json();
+  },
+
+  async preparePaymentLocalOption(
+    paymentId: string,
+    data: PrepareLocalOptionRequest = {}
+  ): Promise<PaymentLocalOptionPrepareResponse> {
+    const response = await fetch(`${API_BASE}/api/v1/payments/${paymentId}/prepare-local-option`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'Payment not found');
+      }
+      throw new ApiError(response.status, 'Failed to prepare local payment option');
     }
     return response.json();
   },

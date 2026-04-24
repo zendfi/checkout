@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 import { PublicMerchantLinkData } from '@/lib/types';
 import { useCheckoutStore } from '@/lib/store';
 import { CryptoCheckout } from '@/components/wizard/CryptoCheckout';
@@ -25,6 +25,7 @@ export default function PublicMerchantPage() {
   const [loading, setLoading] = useState(true);
   const [creatingPayment, setCreatingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [merchantNotFound, setMerchantNotFound] = useState(false);
 
   useEffect(() => {
     if (!merchantUserName) return;
@@ -33,13 +34,19 @@ export default function PublicMerchantPage() {
       try {
         setLoading(true);
         setError(null);
+        setMerchantNotFound(false);
         setCheckoutData(null);
 
         const data = await api.getPublicMerchantLink(merchantUserName);
         setMerchantData(data);
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to load merchant link';
-        setError(message);
+        if (err instanceof ApiError && err.status === 404) {
+          setMerchantNotFound(true);
+          setError(null);
+        } else {
+          const message = err instanceof Error ? err.message : 'Failed to load merchant link';
+          setError(message);
+        }
       } finally {
         setLoading(false);
       }
@@ -72,11 +79,38 @@ export default function PublicMerchantPage() {
     return <ErrorState message={error} />;
   }
 
+  if (merchantNotFound) {
+    return (
+      <div className="min-h-screen bg-[#FAFBFC] flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">zdfi.me/{merchantUserName}</p>
+          <h1 className="mt-3 text-2xl font-semibold text-slate-900">This link does not exist yet.</h1>
+          <p className="mt-2 text-sm text-slate-500">Want one like this for yourself? Create your own global pay link in minutes.</p>
+          <a
+            href="https://dashboard.zendfi.tech/setup"
+            className="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary/90"
+          >
+            Get your own link
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   if (checkoutData) {
     return (
       <>
         <div className="mx-auto w-full max-w-5xl px-4 pt-4 sm:pt-6">
-          <GeoPaymentNotice checkoutData={checkoutData} />
+            <GeoPaymentNotice
+              checkoutData={checkoutData}
+              onLocalPaymentOptionUpdate={(nextOption) => {
+                if (!checkoutData) return;
+                setCheckoutData({
+                  ...checkoutData,
+                  local_payment_option: nextOption,
+                });
+              }}
+            />
         </div>
         <CryptoCheckout />
         <ErrorModal />

@@ -2,8 +2,24 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ZendFi Checkout',
-  description: 'Secure crypto payment powered by Solana',
+  metadataBase: new URL('https://zdfi.me'),
+  title: 'zdfi.me | Global Payment Links by ZendFi',
+  description: 'Get paid globally with one smart link. zdfi.me localizes payment instructions by payer country and route.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'zdfi.me | Global Payment Links by ZendFi',
+    description: 'One link for global payments with localized payer instructions.',
+    url: 'https://zdfi.me',
+    siteName: 'zdfi.me',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'zdfi.me | Global Payment Links by ZendFi',
+    description: 'One link for global payments with localized payer instructions.',
+  },
   icons: {
     icon: '/favicon.ico',
   },

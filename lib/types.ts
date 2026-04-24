@@ -40,12 +40,20 @@ export interface HostedCheckoutData {
   };
 }
 
+export interface SupportedRailOption {
+  country_code: string;
+  provider: string;
+  rail: string;
+  label: string;
+}
+
 export interface PublicMerchantLinkData {
   link_kind: 'general';
   merchant: {
     id: string;
     name: string;
     merchant_user_name: string;
+    email?: string | null;
   };
   routing: {
     country_code: string;
@@ -76,6 +84,30 @@ export interface PublicRequestLinkData {
   local_payment_option?: HostedCheckoutData['local_payment_option'];
   strict_request_only: boolean;
   request_link_url: string;
+}
+
+export interface PublicRequestTransferPrepareResponse {
+  merchant_user_name: string;
+  link_kind: string;
+  request_link_id: string;
+  payment_link_id: string;
+  local_payment_option?: HostedCheckoutData['local_payment_option'];
+  prepare_status?: unknown;
+}
+
+export interface PrepareLocalOptionRequest {
+  country_code?: string;
+  selected_country_code?: string;
+  selected_provider?: string;
+  selected_rail?: string;
+  force_refresh?: boolean;
+}
+
+export interface PaymentLocalOptionPrepareResponse {
+  payment_id: string;
+  country_code: string;
+  local_payment_option?: HostedCheckoutData['local_payment_option'];
+  prepare_status?: unknown;
 }
 
 export interface PaymentLinkResponse {

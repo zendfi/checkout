@@ -76,7 +76,16 @@ export default function PayPage() {
   return (
     <>
       <div className="mx-auto w-full max-w-5xl px-4 pt-4 sm:pt-6">
-        <GeoPaymentNotice checkoutData={checkoutData} />
+          <GeoPaymentNotice
+            checkoutData={checkoutData}
+            onLocalPaymentOptionUpdate={(nextOption) => {
+              if (!checkoutData) return;
+              setCheckoutData({
+                ...checkoutData,
+                local_payment_option: nextOption,
+              });
+            }}
+          />
       </div>
       <CryptoCheckout />
       
