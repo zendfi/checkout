@@ -18,7 +18,8 @@ export default function PayPage() {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const isBridgeCheckout = checkoutData?.local_payment_option?.provider?.toLowerCase() === 'bridge';
+  const localProvider = checkoutData?.local_payment_option?.provider?.toLowerCase();
+  const isLocalNonCryptoCheckout = localProvider === 'bridge' || localProvider === 'paj';
 
   useEffect(() => {
     if (!paymentId) return;
@@ -88,7 +89,7 @@ export default function PayPage() {
             }}
           />
       </div>
-      {!isBridgeCheckout && (
+      {!isLocalNonCryptoCheckout && (
         <>
           <CryptoCheckout />
           

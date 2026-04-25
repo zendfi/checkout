@@ -26,7 +26,8 @@ export default function PublicMerchantPage() {
   const [creatingPayment, setCreatingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [merchantNotFound, setMerchantNotFound] = useState(false);
-  const isBridgeCheckout = checkoutData?.local_payment_option?.provider?.toLowerCase() === 'bridge';
+  const localProvider = checkoutData?.local_payment_option?.provider?.toLowerCase();
+  const isLocalNonCryptoCheckout = localProvider === 'bridge' || localProvider === 'paj';
 
   useEffect(() => {
     if (!merchantUserName) return;
@@ -113,7 +114,7 @@ export default function PublicMerchantPage() {
               }}
             />
         </div>
-        {!isBridgeCheckout && (
+        {!isLocalNonCryptoCheckout && (
           <>
             <CryptoCheckout />
             <ErrorModal />
