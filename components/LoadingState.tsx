@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { API_BASE } from '@/lib/api';
 
 interface PublicGeoContextResponse {
   country_code?: string;
@@ -56,19 +57,23 @@ export function LoadingState() {
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [engineGreeting, setEngineGreeting] = useState<string | null>(null);
 
+  const publicGeoUrl = `${API_BASE}/api/v1/public/geo`;
+  const geoGreetingUrl = (countryCode: string) =>
+    `${API_BASE}/api/geo-greeting?country_code=${encodeURIComponent(countryCode)}`;
+
   useEffect(() => {
     let cancelled = false;
 
     const detectCountry = async () => {
       try {
-        const response = await fetch('/api/v1/public/geo', { cache: 'no-store' });
+        const response = await fetch(publicGeoUrl, { cache: 'no-store' });
         if (!response.ok) throw new Error('geo endpoint unavailable');
         const data: PublicGeoContextResponse = await response.json();
         const code = data.country_code?.trim().toUpperCase();
         if (!cancelled && code && code.length === 2) {
           setCountryCode(code);
           try {
-            const greetingResponse = await fetch(`/api/geo-greeting?country_code=${encodeURIComponent(code)}`, {
+            const greetingResponse = await fetch(geoGreetingUrl(code), {
               cache: 'no-store',
             });
             if (!greetingResponse.ok) throw new Error('greeting endpoint unavailable');
@@ -89,7 +94,7 @@ export function LoadingState() {
       if (!cancelled && fallbackCode) {
         setCountryCode(fallbackCode);
         try {
-          const greetingResponse = await fetch(`/api/geo-greeting?country_code=${encodeURIComponent(fallbackCode)}`, {
+          const greetingResponse = await fetch(geoGreetingUrl(fallbackCode), {
             cache: 'no-store',
           });
           if (!greetingResponse.ok) throw new Error('greeting endpoint unavailable');
