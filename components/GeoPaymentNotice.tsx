@@ -26,8 +26,14 @@ export function GeoPaymentNotice({ checkoutData, onLocalPaymentOptionUpdate }: G
 
   const details = localPaymentOption?.payment_details as Record<string, unknown> | undefined;
   const bridgeVirtualAccount = details?.bridge_virtual_account as Record<string, unknown> | undefined;
-  const bridgeDestination = bridgeVirtualAccount?.destination as Record<string, unknown> | undefined;
-  const bridgeSourceDepositInstructions = bridgeVirtualAccount?.source_deposit_instructions ?? details?.source_deposit_instructions;
+  const bridgeRaw = bridgeVirtualAccount?.raw as Record<string, unknown> | undefined;
+  const bridgeDestination =
+    (bridgeVirtualAccount?.destination as Record<string, unknown> | undefined) ??
+    (bridgeRaw?.destination as Record<string, unknown> | undefined);
+  const bridgeSourceDepositInstructions =
+    bridgeVirtualAccount?.source_deposit_instructions ??
+    bridgeRaw?.source_deposit_instructions ??
+    details?.source_deposit_instructions;
   const bridgeDestinationRail = (bridgeDestination?.payment_rail ?? localPaymentOption?.rail) as string | undefined;
   const bridgeDestinationCurrency = (bridgeDestination?.currency ?? localPaymentOption?.local_currency) as string | undefined;
   const bridgeDestinationAddress =
