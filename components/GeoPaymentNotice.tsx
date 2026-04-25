@@ -34,13 +34,14 @@ export function GeoPaymentNotice({ checkoutData, onLocalPaymentOptionUpdate }: G
     (bridgeDestination?.address ?? details?.destination_address ?? details?.account_number ?? bridgeVirtualAccount?.destination_address) as string | undefined;
 
   const instructionLines = useMemo<Array<[string, unknown]>>(() => {
-    if (!localPaymentOption?.payment_details) return [];
+    const memoDetails = localPaymentOption?.payment_details as Record<string, unknown> | undefined;
+    if (!memoDetails) return [];
     return [
-      ['Status', details.instruction_status],
-      ['Provider instruction ID', details.provider_instruction_id],
-      ['Next step', details.next_step],
-      ['Account number', details.account_number ?? details.bank_account_number],
-      ['Reference', details.reference ?? details.client_reference_id],
+      ['Status', memoDetails.instruction_status],
+      ['Provider instruction ID', memoDetails.provider_instruction_id],
+      ['Next step', memoDetails.next_step],
+      ['Account number', memoDetails.account_number ?? memoDetails.bank_account_number],
+      ['Reference', memoDetails.reference ?? memoDetails.client_reference_id],
     ].filter(([, value]) => value !== undefined && value !== null && value !== '') as Array<[string, unknown]>;
   }, [localPaymentOption?.payment_details]);
 
@@ -218,7 +219,7 @@ export function GeoPaymentNotice({ checkoutData, onLocalPaymentOptionUpdate }: G
               </div>
             </div>
 
-            {bridgeSourceDepositInstructions && (
+            {Boolean(bridgeSourceDepositInstructions) && (
               <div className="mt-3 rounded-xl border border-emerald-200 bg-white/80 p-3 dark:border-emerald-800/60 dark:bg-slate-950/40">
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-200">Source deposit instructions</div>
                 <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-slate-700 dark:text-slate-300">{prettyInstructionValue(bridgeSourceDepositInstructions)}</pre>
