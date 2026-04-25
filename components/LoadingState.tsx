@@ -58,8 +58,8 @@ export function LoadingState() {
   const [engineGreeting, setEngineGreeting] = useState<string | null>(null);
 
   const publicGeoUrl = `${API_BASE}/api/v1/public/geo`;
-  const geoGreetingUrl = (countryCode: string) =>
-    `${API_BASE}/api/geo-greeting?country_code=${encodeURIComponent(countryCode)}`;
+  const sameOriginGreetingUrl = (code: string) =>
+    `/api/geo-greeting?country_code=${encodeURIComponent(code)}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -73,7 +73,7 @@ export function LoadingState() {
         if (!cancelled && code && code.length === 2) {
           setCountryCode(code);
           try {
-            const greetingResponse = await fetch(geoGreetingUrl(code), {
+            const greetingResponse = await fetch(sameOriginGreetingUrl(code), {
               cache: 'no-store',
             });
             if (!greetingResponse.ok) throw new Error('greeting endpoint unavailable');
@@ -94,7 +94,7 @@ export function LoadingState() {
       if (!cancelled && fallbackCode) {
         setCountryCode(fallbackCode);
         try {
-          const greetingResponse = await fetch(geoGreetingUrl(fallbackCode), {
+          const greetingResponse = await fetch(sameOriginGreetingUrl(fallbackCode), {
             cache: 'no-store',
           });
           if (!greetingResponse.ok) throw new Error('greeting endpoint unavailable');
