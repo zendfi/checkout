@@ -26,6 +26,7 @@ export default function PublicMerchantPage() {
   const [creatingPayment, setCreatingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [merchantNotFound, setMerchantNotFound] = useState(false);
+  const isBridgeCheckout = checkoutData?.local_payment_option?.provider?.toLowerCase() === 'bridge';
 
   useEffect(() => {
     if (!merchantUserName) return;
@@ -112,11 +113,15 @@ export default function PublicMerchantPage() {
               }}
             />
         </div>
-        <CryptoCheckout />
-        <ErrorModal />
-        <SuccessModal />
-        <CopySuccessModal />
-        <WalletSelectorModal />
+        {!isBridgeCheckout && (
+          <>
+            <CryptoCheckout />
+            <ErrorModal />
+            <SuccessModal />
+            <CopySuccessModal />
+            <WalletSelectorModal />
+          </>
+        )}
       </>
     );
   }

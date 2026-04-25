@@ -18,6 +18,7 @@ export default function PayPage() {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isBridgeCheckout = checkoutData?.local_payment_option?.provider?.toLowerCase() === 'bridge';
 
   useEffect(() => {
     if (!paymentId) return;
@@ -87,12 +88,16 @@ export default function PayPage() {
             }}
           />
       </div>
-      <CryptoCheckout />
-      
-      {/* Modals - controlled by Zustand store */}
-      <ErrorModal />
-      <SuccessModal />
-      <WalletSelectorModal />
+      {!isBridgeCheckout && (
+        <>
+          <CryptoCheckout />
+          
+          {/* Modals - controlled by Zustand store */}
+          <ErrorModal />
+          <SuccessModal />
+          <WalletSelectorModal />
+        </>
+      )}
     </>
   );
 }

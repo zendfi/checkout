@@ -24,9 +24,17 @@ export function GeoPaymentNotice({ checkoutData, onLocalPaymentOptionUpdate }: G
   const [selectionHydrated, setSelectionHydrated] = useState(false);
   const autoAppliedRef = useRef(false);
 
+  const details = localPaymentOption?.payment_details as Record<string, unknown> | undefined;
+  const bridgeVirtualAccount = details?.bridge_virtual_account as Record<string, unknown> | undefined;
+  const bridgeDestination = bridgeVirtualAccount?.destination as Record<string, unknown> | undefined;
+  const bridgeSourceDepositInstructions = bridgeVirtualAccount?.source_deposit_instructions ?? details?.source_deposit_instructions;
+  const bridgeDestinationRail = (bridgeDestination?.payment_rail ?? localPaymentOption?.rail) as string | undefined;
+  const bridgeDestinationCurrency = (bridgeDestination?.currency ?? localPaymentOption?.local_currency) as string | undefined;
+  const bridgeDestinationAddress =
+    (bridgeDestination?.address ?? details?.destination_address ?? details?.account_number ?? bridgeVirtualAccount?.destination_address) as string | undefined;
+
   const instructionLines = useMemo<Array<[string, unknown]>>(() => {
     if (!localPaymentOption?.payment_details) return [];
-    const details = localPaymentOption.payment_details as Record<string, unknown>;
     return [
       ['Status', details.instruction_status],
       ['Provider instruction ID', details.provider_instruction_id],
@@ -37,21 +45,18 @@ export function GeoPaymentNotice({ checkoutData, onLocalPaymentOptionUpdate }: G
   }, [localPaymentOption?.payment_details]);
 
   if (!localPaymentOption) return null;
-
-  const details = localPaymentOption.payment_details as Record<string, unknown> | undefined;
-  const sourceDepositInstructions = details?.source_deposit_instructions;
   const comingSoon = Boolean(details?.coming_soon);
   const supportedRails = (details?.supported_rails ?? []) as SupportedRailOption[];
   const provider = localPaymentOption.provider.toLowerCase();
   const isBridge = provider === 'bridge';
   const isPaj = provider === 'paj';
   const title = isBridge
-    ? 'Bridge payment instructions'
+    ? 'ACH virtual account'
     : isPaj
       ? 'Paj payment instructions'
       : 'Localized payment instructions';
   const subtitle = isBridge
-    ? 'Follow these transfer instructions exactly to complete your checkout.'
+    ? 'Send the transfer to the account below to complete your checkout.'
     : isPaj
       ? 'Use these local bank transfer details to complete payment in NGN.'
       : 'Use these localized payment details to complete your checkout.';
@@ -195,10 +200,30 @@ export function GeoPaymentNotice({ checkoutData, onLocalPaymentOptionUpdate }: G
           </div>
         </div>
 
-        {isBridge && Boolean(sourceDepositInstructions) && (
-          <div className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Source deposit instructions</div>
-            <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-slate-700 dark:text-slate-300">{prettyInstructionValue(sourceDepositInstructions)}</pre>
+        {isBridge && bridgeVirtualAccount && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800/60 dark:bg-emerald-900/15">
+            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-200">ACH virtual account</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
+              <div className="rounded-xl bg-white/80 p-3 dark:bg-slate-900/50">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">Destination rail</div>
+                <div className="mt-1 font-semibold text-slate-900 dark:text-white">{prettyInstructionValue(bridgeDestinationRail)}</div>
+              </div>
+              <div className="rounded-xl bg-white/80 p-3 dark:bg-slate-900/50">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">Destination currency</div>
+                <div className="mt-1 font-semibold text-slate-900 dark:text-white">{prettyInstructionValue(bridgeDestinationCurrency)}</div>
+              </div>
+              <div className="rounded-xl bg-white/80 p-3 dark:bg-slate-900/50 sm:col-span-2">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">Account / address</div>
+                <div className="mt-1 break-all font-semibold text-slate-900 dark:text-white">{prettyInstructionValue(bridgeDestinationAddress)}</div>
+              </div>
+            </div>
+
+            {bridgeSourceDepositInstructions && (
+              <div className="mt-3 rounded-xl border border-emerald-200 bg-white/80 p-3 dark:border-emerald-800/60 dark:bg-slate-950/40">
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-200">Source deposit instructions</div>
+                <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-slate-700 dark:text-slate-300">{prettyInstructionValue(bridgeSourceDepositInstructions)}</pre>
+              </div>
+            )}
           </div>
         )}
 
